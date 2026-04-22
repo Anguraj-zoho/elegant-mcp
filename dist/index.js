@@ -1050,14 +1050,39 @@ const TOOLS = [
             properties: {},
         },
     },
+    {
+        name: "get_page_blueprint",
+        description: "Returns a detailed visual blueprint of a real Log360 Cloud page — exact layout, component hierarchy, column names, data patterns, chart config, and sidemenu structure. ALWAYS call this before building any page to understand the correct structure.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                page: {
+                    type: "string",
+                    description: "Page name to get the blueprint for.",
+                    enum: [
+                        "reports-windows-all-events",
+                        "reports-windows-startup",
+                        "reports-windows-logon",
+                        "reports-unix-all-events",
+                        "dashboard",
+                        "alerts",
+                        "compliance",
+                        "search",
+                        "settings",
+                    ],
+                },
+            },
+            required: ["page"],
+        },
+    },
 ];
 /* ══════════════════════════════════════════════════════
    TOOL HANDLERS
 ══════════════════════════════════════════════════════ */
 function rewriteAssetPaths(html) {
     return html
-        .replace(/src="assets\//g, `src="${CDN_BASE}/assets/`)
-        .replace(/href="assets\//g, `href="${CDN_BASE}/assets/`);
+        .replace(/src="(?:\.\.\/)*assets\//g, `src="${CDN_BASE}/assets/`)
+        .replace(/href="(?:\.\.\/)*assets\//g, `href="${CDN_BASE}/assets/`);
 }
 async function handleGetComponent(args) {
     const entry = COMPONENT_MAP[args.name];
@@ -1224,7 +1249,7 @@ function handleGetIcons(args) {
     return `${icons.length} icon(s):\n\n${withCdn.join("\n")}`;
 }
 async function handleGetFullWikiFile(args) {
-    return readWikiFile(args.filename);
+    return rewriteAssetPaths(await readWikiFile(args.filename));
 }
 function handleGetAntiPatterns() {
     return ANTI_PATTERNS;
@@ -1240,8 +1265,194 @@ async function handleGetTopnavbar() {
         return "TopNavBar not found in component map";
     const content = await readWikiFile(entry.file);
     let html = extractHtmlBlock(content, entry.section);
-    html = html.replace(/src="assets\//g, `src="${CDN_BASE}/assets/`);
+    html = rewriteAssetPaths(html);
     return `## TopNavBar — Complete HTML\n\nSource: ${entry.file}\n\nCDN Base: ${CDN_BASE}\n\n⚠️ IMPORTANT: All <img> src paths use CDN URLs.\nLogo: \`${CDN_BASE}/assets/icons/logo-log360.svg\`\nIcons: \`${CDN_BASE}/assets/icons/icon-*.svg\`\nNEVER replace these with inline <svg>.\n\n\`\`\`html\n${html}\n\`\`\``;
+}
+/* ══════════════════════════════════════════════════════
+   PAGE BLUEPRINTS — Structured visual descriptions of real Log360 pages
+══════════════════════════════════════════════════════ */
+const PAGE_BLUEPRINTS = {
+    "reports-windows-all-events": `# Blueprint: Reports > Servers & Workstation > Windows > All Events
+
+## Layout (Shell C)
+TopNavBar → data-active-tab="Reports"
+QuickLink bar (line-tab): Servers & Workstation (selected) | Network Devices | Cloud Sources | ...
+Sidemenu Type 2 (left): OS dropdown "Windows" + search + flat accordion sections
+Main content: Header + input-row + classic-tab (chart) + table-scroll-area
+
+## TopNavBar Row 2
+Tab items: Servers & Workstation | Network Devices | Cloud Protection | Applications | Active Directory | Microsoft 365 | Cloud Sources | File Integrity Monitoring | Threats | VM Management | Custom Reports
+
+## Sidemenu (flat accordion with chevron-right icons)
+Sections (each has > chevron that rotates on expand):
+- Windows Events (expanded by default, shows sub-items)
+  - All Events (highlighted when active)
+  - Important Events
+  - User Based Activity
+- Logon Reports >
+- Device Severity Reports >
+- Windows Startup Events > (expand to show: Windows Startup, Windows ShutDown, Windows Restarts, Unexpected Shutdown, System Uptime, Windows Startup and Windows ShutDown)
+- USB Storage Auditing >
+- System Events >
+- Windows Firewall Auditing >
+- Registry Changes >
+- Service Audit >
+- Eventlog Reports >
+- Network Share Auditing >
+- Local Account Management >
+- Process Tracking >
+- DNS Server >
+- Policy Changes >
+- Group Management >
+- Logoff Reports >
+- Failed Logon Reports >
+- Windows Backup and Restore >
+- Program Inventory >
+- Application Whitelisting >
+- Windows Important Events >
+- Threat Detection from Antivirus >
+- Threat Detection >
+- Application Crashes >
+- Network Policy Server >
+- Wireless Network Reports >
+- Powershell Auditing >
+
+Bottom links: Scheduled Reports | Manage Reports | Need New Reports?
+
+## Page Header (header-v3)
+Title: "All Events" + help icon
+Right buttons: Edit Report | Export As ▾ | Schedule Reports | More ▾
+
+## Input Row (reports-input-row--type1)
+Fields: Select Log Source [dropdown with IP tags] | Period [date range picker] | [Generate button blue]
+
+## Classic Tab (chart toggle — ONE chart area, NOT two separate charts)
+Tab headers: All Events (selected) | Top Source | Top Devices | Time Based View | TEST
+Below tabs: ONE chart container with rpt-chart-floater toolbar (customize + chart/table toggle)
+Chart: Line chart showing event count over time (x-axis: dates, y-axis: count)
+Legend below chart: ● Error ● Warning ● Information ● Success ● Failure (color-coded)
+
+⚠️ CRITICAL: This is ONE classic-tab with ONE chart area. The tab buttons switch between All Events / Top Source / Top Devices views. Do NOT create separate charts for each tab. Use classic-tab JS to toggle content panels.
+
+## Table
+ActionBar: [list/table view toggle] [Incident button] | pagination "1-10 of 3302351" [< >] [10 ▾] [columns icon]
+Columns: [checkbox] | Source | Log Source | Severity | Event ID | Display Name | Source (rightmost) | Timestamp
+Row data pattern: "2020-04-18 01:30:48 | server | success | 4689 | Server | microsoft-windows-security-auditing"
+Rows show realistic Windows event log data with Event IDs like 4689, 4658, 4656, 7036.`,
+    "reports-windows-startup": `# Blueprint: Reports > Servers & Workstation > Windows > Windows Startup
+
+## Layout (Shell C)
+Same as "reports-windows-all-events" but sidemenu has "Windows Startup Events > Windows Startup" highlighted.
+
+## Sidemenu
+"Windows Startup Events" section is EXPANDED showing sub-items:
+- Windows Startup (highlighted/active)
+- Windows ShutDown
+- Windows Restarts
+- Unexpected Shutdown
+- System Uptime
+- Windows Startup and Windows ShutDown
+
+## Page Header
+Title: "Startup Events" (NOT "Windows Startup" — use the actual report title)
+
+## Input Row
+Fields: Select Log Source [dropdown "All Devices"] | Time Period [dropdown "Last 24 Hours"] | [Generate button blue]
+
+## Classic Tab (Bar / Line toggle — ONE chart, toggle between views)
+Tab headers: Bar (selected by default) | Line
+ONE chart area with rpt-chart-floater.
+Default view: Bar chart showing startup events count by device (x-axis: device hostnames, y-axis: event count)
+Line tab: Line chart showing startup events over time (x-axis: dates, y-axis: count)
+
+⚠️ CRITICAL: This is a classic-tab with Bar/Line toggle. There is ONE chart area. The classic-tab JS handles switching between bar and line views. Do NOT render two charts. Render ONE and use:
+\`\`\`js
+// In Bar tab content:
+ElegantEChart.bar('mainChart', { labels:[...], datasets:[...] });
+// In Line tab content (hidden by default):
+// Chart renders on tab switch via classic-tab.js
+\`\`\`
+
+## Table
+ActionBar: same as all-events (search + Incident + pagination + columns)
+Columns: [checkbox] | Source | Event ID | Event Description | Source (IP) | Log Source Type | Event Generated | Timestamp
+Row data pattern: Windows startup log entries with:
+- Source: "EventLog" or "Service Control"
+- Event ID: 6005, 6009, 7036, 10, etc.
+- Event Description: "The Event log service was started", "Microsoft Windows...", "The following boot-start or system-start..."
+- Log Source Type: "@Author"
+- Realistic timestamps
+Total rows: ~260 (show "1-50 of 260" in pagination)`,
+    "reports-unix-all-events": `# Blueprint: Reports > Servers & Workstation > Unix > All Events
+
+## Layout (Shell C)
+Same shell as Windows but OS dropdown in sidemenu set to "Unix/Linux".
+
+## Sidemenu
+OS dropdown: Unix/Linux (selected)
+Sections change to Unix-specific: All Events | Important Events | SU Logons | Logon Reports | Failed Logon Reports | ...
+
+## Classic Tab
+Tab headers: All Events | Top Source | Top Devices | Time Based View
+Chart: Line chart with severity breakdown
+
+## Table
+Columns similar to Windows but with Unix-specific event data.`,
+    "dashboard": `# Blueprint: Dashboard (Shell A)
+
+## Layout (Shell A)
+TopNavBar → data-active-tab="Home"
+No sidemenu. Full-width main content.
+Content: stat-cards row + widget grid (2×2 or 3×2) with charts and tables.
+
+## Stat Cards Row (4 cards)
+- Total Events (number, blue)
+- Critical (number, red)
+- Warning (number, orange)
+- Information (number, green)
+
+## Widget Grid
+Each widget uses the widget component with header + chart or table inside.
+Typical widgets: Event Trend (line chart), Top Sources (bar chart), Severity Distribution (donut chart), Recent Alerts (table).`,
+    "alerts": `# Blueprint: Alerts (Shell D)
+
+## Layout (Shell D - Split Panel)
+TopNavBar → data-active-tab="Alerts"
+No sidemenu. Stat cards row + table + right-side detail drawer.
+
+## Stat Cards
+4 severity stat cards: Critical | Trouble | Attention | Information (with counts)
+
+## Table
+Columns: [checkbox] | Alert Name | Severity | Message Format | Log Source | Generated | Status
+Rows: Alert entries with realistic names like "EXE Process Executed", "Failed Logon Attempt", etc.
+
+## Detail Drawer (right panel)
+Opens on row click. Shows: Alert title, MITRE mapping, Investigation panel, Timeline, Affected Entities.`,
+    "compliance": `# Blueprint: Compliance (Shell C variant)
+
+## Layout
+TopNavBar → data-active-tab="Compliance"
+Opening page: Grid of compliance standards with icons (PCI-DSS, HIPAA, SOX, GDPR, FISMA, etc.)
+Each card: Icon + standard name + description + "View Reports" button.`,
+    "search": `# Blueprint: Search (Shell B)
+
+## Layout
+TopNavBar → data-active-tab="Search"
+Full-width search bar at top.
+Results area below with filters on left and results table on right.`,
+    "settings": `# Blueprint: Settings (Shell B)
+
+## Layout (Shell B)
+TopNavBar → data-active-tab="Settings"
+Sidemenu Type 1 (settings variant) on left.
+Main content: form-based settings panels.`,
+};
+function handleGetPageBlueprint(args) {
+    const bp = PAGE_BLUEPRINTS[args.page];
+    if (!bp)
+        return `Unknown page: ${args.page}. Options: ${Object.keys(PAGE_BLUEPRINTS).join(", ")}`;
+    return bp;
 }
 /* ══════════════════════════════════════════════════════
    MCP SERVER SETUP
@@ -1288,6 +1499,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 break;
             case "get_topnavbar":
                 text = await handleGetTopnavbar();
+                break;
+            case "get_page_blueprint":
+                text = handleGetPageBlueprint(args);
                 break;
             default: text = `Unknown tool: ${name}`;
         }
