@@ -223,35 +223,285 @@ const SCREENSHOTS: string[] = [
 const SCREENSHOT_BASE = `https://raw.githubusercontent.com/${PRIVATE_REPO}/main/data/LOG360%20Cloud%20Full%20Product%20Bulk%20Screenshot_`;
 
 const PAGE_BLUEPRINTS: Record<string, string> = {
-"reports-windows-all-events": "# Blueprint: Reports > Windows > All Events\n\n## Layout (Shell C)\nTopNavBar → Reports | QuickLink: Servers & Workstation | Sidemenu Type 2 | Header v3\n\n## Sidemenu\nOS: Windows | Sections: Windows Events (expanded: All Events, Important Events, User Based Activity), Logon Reports, Device Severity Reports, Windows Startup Events, USB Storage Auditing, System Events, etc.\n\n## Input Row\nSelect Log Source [dropdown] | Period [date range] | [Generate]\n\n## Classic Tab (ONE chart area)\nTabs: All Events | Top Source | Top Devices | Time Based View\nChart: Line chart with severity legend (Error, Warning, Information, Success, Failure)\n\n## Table\nActionBar Type 8 | Columns: checkbox | Source | Log Source | Severity | Event ID | Display Name | Source | Timestamp",
+"reports-windows-all-events": `# Blueprint: Reports > Servers & Workstation > Windows > All Events
 
-"reports-windows-startup": "# Blueprint: Reports > Windows > Windows Startup\n\n## Layout (Shell C)\nSame as all-events, sidemenu 'Windows Startup Events > Windows Startup' highlighted.\n\n## Sidemenu expanded section\nWindows Startup Events: Windows Startup (active), Windows ShutDown, Windows Restarts, Unexpected Shutdown, System Uptime, Windows Startup and Windows ShutDown\n\n## Page Header: 'Startup Events'\n\n## Input Row\nSelect Log Source [All Devices] | Time Period [Last 24 Hours] | [Generate]\n\n## Classic Tab (Bar/Line toggle)\nBar (default) | Line — ONE chart area, rpt-chart-floater\n\n## Table\nColumns: checkbox | Source | Event ID | Event Description | Source IP | Log Source Type | Event Generated | Timestamp\nPagination: 1-50 of 260",
+## Layout (Shell C)
+TopNavBar → data-active-tab="Reports"
+QuickLink bar (line-tab): Servers & Workstation (selected) | Network Devices | Cloud Sources | ...
+Sidemenu Type 2 (left): OS dropdown "Windows" + search + flat accordion sections
+Main content: Header + input-row + classic-tab (chart) + table-scroll-area
 
-"dashboard": "# Blueprint: Dashboard — Events Overview (Shell A)\n\nTopNavBar → Home | Line-tab: Events Overview (selected) | Date picker\n\n## Stat Cards (4)\n1. All Events: 4489K\n2. Windows Events: 3302K\n3. Syslog Events: 11444\n4. All Log Sources: 18\n\n## Widgets (2 cols × 3 rows)\nRow 1: Log Trend (area chart) | Recent Alerts (list)\nRow 2: Security Events (table) | Top 5 Log Sources (donut)\nRow 3: Windows Severity Events (bar) | Syslog Severity Events (bar)",
+## TopNavBar Row 2
+Tab items: Servers & Workstation | Network Devices | Cloud Protection | Applications | Active Directory | Microsoft 365 | Cloud Sources | File Integrity Monitoring | Threats | VM Management | Custom Reports
 
-"alerts": "# Blueprint: Alerts (Shell D variant)\n\nTopNavBar → Alerts | Line-tab: Alerts | Incident\nNo sidemenu. Stat cards (Critical, Trouble, Attention, All) → direct table.\nActionBar: pagination | columns\nColumns: checkbox | Severity | Profile Name | Time | Alert Message Format | Log Source",
+## Sidemenu (flat accordion with chevron-right icons)
+Sections (each has > chevron that rotates on expand):
+- Windows Events (expanded by default, shows sub-items)
+  - All Events (highlighted when active)
+  - Important Events
+  - User Based Activity
+- Logon Reports >
+- Device Severity Reports >
+- Windows Startup Events > (expand to show: Windows Startup, Windows ShutDown, Windows Restarts, Unexpected Shutdown, System Uptime, Windows Startup and Windows ShutDown)
+- USB Storage Auditing >
+- System Events >
+- Windows Firewall Auditing >
+- Registry Changes >
+- Service Audit >
+- Eventlog Reports >
+- Network Share Auditing >
+- Local Account Management >
+- Process Tracking >
+- DNS Server >
+- Policy Changes >
+- Group Management >
+- Logoff Reports >
+- Failed Logon Reports >
+- Windows Backup and Restore >
+- Program Inventory >
+- Application Whitelisting >
+- Windows Important Events >
+- Threat Detection from Antivirus >
+- Threat Detection >
+- Application Crashes >
+- Network Policy Server >
+- Wireless Network Reports >
+- Powershell Auditing >
 
-"settings": "# Blueprint: Settings — Device Management (Shell B)\n\nTopNavBar → Settings | Sidemenu Type 1 (icons, not flat accordion)\nLine Tab: Windows Devices (7) | Syslog Devices (1) | Other Devices (7)\nTable: checkbox | Actions | Device | Show IP | Agent | Last Message | Next Scan | Monitoring Interval | Log Source Group | Status",
+Bottom links: Scheduled Reports | Manage Reports | Need New Reports?
 
-"compliance": "# Blueprint: Compliance Landing (no sidemenu)\n\nTopNavBar → Compliance | Search bar | Manage Compliance link\nGrid (3 cols): PCI-DSS, HIPAA, FISMA, GDPR, SOX, ISO 27001... each card with icon + description + View Reports button",
+## Page Header (header-v3)
+Title: "All Events" + help icon
+Right buttons: Edit Report | Export As ▾ | Schedule Reports | More ▾
 
-"compliance-report": "# Blueprint: Compliance Report (Shell C)\n\nLine-tab top: PCI-DSS | HIPAA | FISMA | ...\nSidemenu Type 2: ← PCI-DSS back + accordion sections\nHorizontal bar chart + table with user logon data",
+## Input Row (reports-input-row--type1)
+Fields: Select Log Source [dropdown with IP tags] | Period [date range picker] | [Generate button blue]
 
-"search": "# Blueprint: Search\n\nTopNavBar → Search | No sidemenu\nSearch box: query input + Basic/Advanced tabs\nResults: bar chart + list view with key-value fields",
+## Classic Tab (chart toggle — ONE chart area, NOT two separate charts)
+Tab headers: All Events (selected) | Top Source | Top Devices | Time Based View | TEST
+Below tabs: ONE chart container with rpt-chart-floater toolbar (customize + chart/table toggle)
+Chart: Line chart showing event count over time (x-axis: dates, y-axis: count)
+Legend below chart: ● Error ● Warning ● Information ● Success ● Failure (color-coded)
 
-"security": "# Blueprint: Security Analytics (Shell A variant)\n\nStat Cards: All Rules, Critical, Trouble, Attention\nWidgets: Detection Pipeline, Detection by Tactics (radar), Recent Detections, Top Users, Top Log Sources, Top Detections, Detection Trends",
+⚠️ CRITICAL: This is ONE classic-tab with ONE chart area. The tab buttons switch between All Events / Top Source / Top Devices views. Do NOT create separate charts for each tab. Use classic-tab JS to toggle content panels.
 
-"cloud-protection": "# Blueprint: Cloud Protection (Shell A variant)\n\nLine-tab: Application Insight | User Insight\nStat Cards: Total Traffic, Total Request, Discovered Apps, Shadow Apps\nWidgets: Traffic Trend, Top Cloud Apps, Banned Apps, Shadow Apps, Download/Upload Size, Categories",
+## Table
+ActionBar: [list/table view toggle] [Incident button] | pagination "1-10 of 3302351" [< >] [10 ▾] [columns icon]
+Columns: [checkbox] | Source | Log Source | Severity | Event ID | Display Name | Source (rightmost) | Timestamp
+Row data pattern: "2020-04-18 01:30:48 | server | success | 4689 | Server | microsoft-windows-security-auditing"
+Rows show realistic Windows event log data with Event IDs like 4689, 4658, 4656, 7036.`,
 
-"settings-license": "# Blueprint: Settings License (Shell B)\n\nStorage stats, feature table with usage bars, plan details.",
+"reports-windows-startup": `# Blueprint: Reports > Servers & Workstation > Windows > Windows Startup
 
-"incident-workbench": "# Blueprint: Incident Workbench (floating panel)\n\nBottom-right panel on every page. Shows investigation tools.",
+## Layout (Shell C)
+Same as "reports-windows-all-events" but sidemenu has "Windows Startup Events > Windows Startup" highlighted.
 
-"dashboard-network": "# Blueprint: Dashboard Network Overview (Shell A)\n\nSame as Events Overview but Network Overview tab selected.",
+## Sidemenu
+"Windows Startup Events" section is EXPANDED showing sub-items:
+- Windows Startup (highlighted/active)
+- Windows ShutDown
+- Windows Restarts
+- Unexpected Shutdown
+- System Uptime
+- Windows Startup and Windows ShutDown
 
-"alerts-manage-profiles": "# Blueprint: Alerts > Manage Profiles\n\nTable: checkbox | Alert Type | Severity | Message | Log Source | Action",
+## Page Header
+Title: "Startup Events" (NOT "Windows Startup" — use the actual report title)
 
-"reports-unix-all-events": "# Blueprint: Reports > Unix > All Events (Shell C)\n\nSidemenu OS: Unix/Linux | Sections: All Events, Important Events, SU Logons, Logon/Failed Logon/System Events, Terminal Service, FTP Server\nChart: Line with severity legend\nTable: Same columns as Windows reports",
+## Input Row
+Fields: Select Log Source [dropdown "All Devices"] | Time Period [dropdown "Last 24 Hours"] | [Generate button blue]
+
+## Classic Tab (Bar / Line toggle — ONE chart, toggle between views)
+Tab headers: Bar (selected by default) | Line
+ONE chart area with rpt-chart-floater.
+Default view: Bar chart showing startup events count by device (x-axis: device hostnames, y-axis: event count)
+Line tab: Line chart showing startup events over time (x-axis: dates, y-axis: count)
+
+⚠️ CRITICAL: This is a classic-tab with Bar/Line toggle. There is ONE chart area. The classic-tab JS handles switching between bar and line views. Do NOT render two charts. Render ONE and use:
+\`\`\`js
+// In Bar tab content:
+ElegantEChart.bar('mainChart', { labels:[...], datasets:[...] });
+// In Line tab content (hidden by default):
+// Chart renders on tab switch via classic-tab.js
+\`\`\`
+
+## Table
+ActionBar: same as all-events (search + Incident + pagination + columns)
+Columns: [checkbox] | Source | Event ID | Event Description | Source (IP) | Log Source Type | Event Generated | Timestamp
+Row data pattern: Windows startup log entries with:
+- Source: "EventLog" or "Service Control"
+- Event ID: 6005, 6009, 7036, 10, etc.
+- Event Description: "The Event log service was started", "Microsoft Windows...", "The following boot-start or system-start..."
+- Log Source Type: "@Author"
+- Realistic timestamps
+Total rows: ~260 (show "1-50 of 260" in pagination)`,
+
+"reports-unix-all-events": `# Blueprint: Reports > Servers & Workstation > Unix > All Events
+
+## Layout (Shell C)
+Same shell as Windows reports but OS dropdown in sidemenu set to "Unix/Linux".
+
+## Sidemenu
+OS dropdown: Unix/Linux (selected)
+Sections: All Events (highlighted), Important Events, SU Logons, Logon Reports >, Failed Logon Reports >, System Events >, Terminal Service Session >, FTP Server Reports >
+Bottom links: Scheduled Reports | Manage Reports | Need New Reports?
+
+## Page Header (header-v3)
+Title: "All Events" + help icon
+Right buttons: Edit Report | Export As ▾ | Schedule Reports | More ▾
+
+## Input Row
+Fields: Select Log Source [dropdown] | Period [date range picker] | [Generate button blue]
+
+## Classic Tab (chart toggle)
+Tab headers: All Events (selected) | Top Source | Top Devices | Time Based View
+ONE chart area with rpt-chart-floater. Line chart with severity breakdown.
+Legend: ● Error ● Warning ● Information ● Success ● Failure
+
+## Table
+ActionBar: list/table view toggle | Incident | pagination | columns
+Columns: [checkbox] | Source | Log Source | Severity | Event ID | Display Name | Source | Timestamp`,
+
+"dashboard": `# Blueprint: Dashboard — Events Overview (Shell A)
+
+## Layout (Shell A)
+TopNavBar → data-active-tab="Home"
+QuickLink bar (line-tab): Events Overview (selected) | Network Overview | AD Overview | AWS Overview | Microsoft 365 | File Monitoring | Incident Overview | PgSQL Overview | SQL Server Overview | AD Summary | Threat Analytics | Cloud Protection | Custom Tab 1
+No sidemenu. Full-width scrollable main content. Date range picker in top-right.
+
+## Stat Cards Row (4 cards, horizontal)
+1. All Events: "4489K" with delta "▲ 4441,946 (3406.52%)" — blue icon
+2. Windows Events: "3302K" with sub-stats
+3. Syslog Events: "11444" with delta "▲ 9942 (471.63%)"
+4. All Log Sources: "18" with link "View All Log Sources"
+
+## Widget Grid (2 columns, 3 rows)
+Row 1: "Log Trend" area chart | "Recent Alerts" scrollable list
+Row 2: "Security Events" table | "Top 5 Log Sources" donut chart
+Row 3: "Windows Severity Events" bar chart | "Syslog Severity Events" bar chart
+
+## Key Rules
+- Each widget uses the widget component
+- Charts use ElegantEChart.* calls
+- Incident Workbench floating button at bottom-right`,
+
+"dashboard-network": `# Blueprint: Dashboard — Network Overview (Shell A)
+Same as Events Overview but "Network Overview" tab selected in quicklink bar.
+Stat cards + widget grid for network-specific data.`,
+
+"alerts": `# Blueprint: Alerts (Shell D — no sidemenu)
+
+## Layout
+TopNavBar → data-active-tab="Alerts"
+Line-tab: Alerts (selected) | Incident
+No sidemenu — full-width content. Date range picker in top-right.
+Right actions: Export As ▾ | Add Alert Profile | Manage Profiles
+
+## Stat Cards Row (4 horizontal)
+1. Critical Alerts: "184185" — red
+2. Trouble Alerts: "6942" — orange
+3. Attention Alerts: "222" — yellow
+4. All Alerts: "191349" — blue
+
+## Table (NO chart — directly below stat cards)
+ActionBar: pagination "1-10 of 191349" [< >] [10 ▾] | Add/Remove Columns
+Columns: [checkbox] | Severity | Profile Name | Time ▾ | Alert Message Format | Log Source
+
+## Key Rules
+- NO chart on this page — stat cards go directly to table
+- Severity column shows colored labels
+- Incident Workbench floating button at bottom-right`,
+
+"alerts-manage-profiles": `# Blueprint: Alerts > Manage Profiles
+Same TopNavBar + line-tab. Table: checkbox | Alert Type | Severity | Message | Log Source | Action`,
+
+"compliance": `# Blueprint: Compliance — Landing Page (no sidemenu)
+
+## Layout
+TopNavBar → data-active-tab="Compliance"
+Search bar at top-left | "Manage Compliance" link top-right
+Grid (3 columns): each card has icon + title + description + "View Reports" button
+
+### Row 1: PCI-DSS | HIPAA | FISMA
+### Row 2: GDPR | SOX | ISO 27001:2013
+### Row 3+: more compliance standards`,
+
+"compliance-report": `# Blueprint: Compliance > PCI-DSS > Report Page (Shell C)
+
+## Layout (Shell C)
+Line-tab top: PCI-DSS (selected) | HIPAA | FISMA | GDPR | SOX | ...
+Sidemenu Type 2: ← PCI-DSS back + accordion sections (Windows Logon Reports expanded)
+
+## Page Header
+"← PCI-DSS" back link + Title: "User Logons"
+Right: Export As ▾ | date range
+
+## Chart Area (single horizontal bar chart — NO classic-tab toggle)
+
+## Table
+ActionBar: list/table view toggle | pagination "1-10 of 299" [< >] [10 ▾] | columns
+Columns: [checkbox] | Time | Log Source | User Name | Remote Device | Remote Domain | Domain | Logon Type | Process Id`,
+
+"search": `# Blueprint: Search (custom layout)
+
+TopNavBar → data-active-tab="Search" | No sidemenu
+Search box: query input + Basic/Advanced tabs + Search button
+Results: bar chart + list view (NOT table) with dense key-value fields per row
+ActionBar: Incident button | pagination | Add/Remove Fields`,
+
+"security": `# Blueprint: Security — Analytics Dashboard (Shell A variant)
+
+TopNavBar → data-active-tab="Security" | No sidemenu
+
+## Stat Cards (4): All Rules 81952 | Critical 48968 | Trouble 16247 | Attention 16737
+
+## Widget Grid (3 columns)
+Row 1: Detection Pipeline (stacked bar) | Detection by Tactics (radar/MITRE) | Recent Detections (list)
+Row 2: Top 5 Users (bar) | Top 5 Log Sources (hbar)
+Row 3: Top 10 Detections by Rules (bar) | Detection Trends (line, 3 series)
+
+## Key Rules
+- MITRE ATT&CK radar chart
+- Color coding: Critical=#E24C4C, Trouble=#F5A623, Attention=#F8D648`,
+
+"cloud-protection": `# Blueprint: Cloud Protection (Shell A variant)
+
+Line-tab: Application Insight (selected) | User Insight | Date picker
+
+## Stat Cards (4): Total Traffic 298.69GB | Total Request 50416 | Discovered Apps 28 | Shadow Apps 10
+
+## Widget Grid (3 columns)
+Row 1: Total Traffic Trend (area) | Top Cloud Apps (donut) | Top Banned Apps (table)
+Row 2: Shadow Apps (bar) | Download Size (donut) | Upload Size (hbar)
+Row 3: Top Categories (hbar) | Low Reputed Apps (bar)`,
+
+"settings": `# Blueprint: Settings — Device Management (Shell B)
+
+## Layout (Shell B)
+TopNavBar → data-active-tab="Settings"
+Sidemenu Type 1 (settings variant — icons, NOT flat accordion):
+- 2 icon tabs: Configuration | Admin
+- Sections with icons: Log Source Configuration (expanded: Devices, Applications, Import Logs, Manage Cloud Sources, File Integrity Monitoring), Cloud Protection Settings
+
+## Page Header: "Device Management"
+
+## Line Tab (below header)
+Tabs: Windows Devices (7) (selected) | Syslog Devices (1) | Other Devices (7)
+
+## Input Row
+Select Category: [All Devices ▾] | "Configure domain/workgroups" link | [+ Add Device(s)] button
+
+## Table
+ActionBar: search | filter | action icons | pagination "1-10 of 64" [< >] [10 ▾] | view toggle
+Columns: [checkbox] | Actions | Device ▾ | Show IP | Agent | Last Message Time ▾ | Next Scan On | Monitoring Interval | Log Source Group | Status
+- Actions: 3 small icon buttons per row
+- Status: "Listening for logs" (green), "Disabled" (red)`,
+
+"settings-license": `# Blueprint: Settings — License Page (Shell B)
+Same settings shell. Storage stats, feature table with usage bars, plan details.`,
+
+"incident-workbench": `# Blueprint: Incident Workbench (floating panel)
+Bottom-right panel on every page. Shows investigation tools (IP Threat Intel, Process Hunting, User Activity Overview).`,
 };
 
 /* ══════════════════════════════════════════════════════
