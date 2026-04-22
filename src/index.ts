@@ -1110,7 +1110,263 @@ const TOOLS: Tool[] = [
       required: ["page"],
     },
   },
+  {
+    name: "get_screenshot",
+    description: "Searches 217 real Log360 Cloud product screenshots by keywords. Returns matching image URLs you can view to understand exact layout, colors, spacing, and data patterns. ALWAYS use this to see what a page really looks like before building it.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description: "Search keywords (e.g. 'windows startup', 'alerts main', 'dashboard events', 'settings device'). Searches screenshot filenames.",
+        },
+        max_results: {
+          type: "number",
+          description: "Max results (default 5)",
+        },
+      },
+      required: ["query"],
+    },
+  },
 ];
+
+/* ══════════════════════════════════════════════════════
+   SCREENSHOT INDEX — 217 real product screenshots
+══════════════════════════════════════════════════════ */
+const SCREENSHOTS: string[] = [
+"ALERTS TAB/[Interaction] Alerts - Add Alert Profile Form with Name Criteria Severity Message Format.png",
+"ALERTS TAB/[Interaction] Alerts - Add Alert Profile Form with Notification Settings Email Config.png",
+"ALERTS TAB/[Interaction] Alerts - Alert Detail Drawer EXE Process Executed with MITRE and Ticket Status.png",
+"ALERTS TAB/[Interaction] Alerts - Create View Modal with Severity Equals Critical Filter Criteria.png",
+"ALERTS TAB/[Interaction] Alerts - Select Columns Modal with Available and Selected Column Lists.png",
+"ALERTS TAB/[Interaction] Alerts - Settings Gear Dropdown with Ticketing Tool Integration Option.png",
+"ALERTS TAB/[Interaction] Alerts - Ticketing Tool Integration Form ServiceDesk Plus with Client ID.png",
+"ALERTS TAB/[Interaction] Alerts - Ticketing Tool Macros Dropdown Source EventID LogSource Severity.png",
+"ALERTS TAB/[Interaction] Alerts - View Filter Dropdown with All Critical Trouble Attention Options.png",
+"ALERTS TAB/[Main] Alerts - Investigation Mitigation Actions Affected Entities Future Risks.png",
+"ALERTS TAB/[Main] Alerts - Investigation Panel with Insights Summary Timeline MITRE Mapping.png",
+"ALERTS TAB/[Main] Alerts - Investigation Result Attack Chain with Affected Entities and Events.png",
+"ALERTS TAB/[Main] Alerts - Main View Severity Stat Cards Table with Critical Trouble Attention Counts.png",
+"ALERTS TAB/[Main] Alerts - Manage Profiles Table with Alert Types Severity Log Source Actions.png",
+"CLOUD PROTECTION TAB/[Main] Cloud Protection - Application Insight Dashboard Traffic Trend Shadow Apps Banned Apps Charts.png",
+"CLOUD PROTECTION TAB/[Main] Cloud Protection - User Insight Dashboard Actors Trend Shadow Banned Apps Download Upload Size.png",
+"COMPLIANCE TAB/[Interaction] Compliance - Create New Compliance Form Source Domain Report Groups.png",
+"COMPLIANCE TAB/[Interaction] Compliance - Edit HIPAA Configuration Form Source Domain Reports.png",
+"COMPLIANCE TAB/[Interaction] Compliance - Edit PCI-DSS Configuration Form Source Domain Reports.png",
+"COMPLIANCE TAB/[Interaction] Compliance - HIPAA Custom View Edit Mode Checkbox Tabs Save Cancel.png",
+"COMPLIANCE TAB/[Interaction] Compliance - HIPAA Custom View Edit Mode Duplicate.png",
+"COMPLIANCE TAB/[Interaction] Compliance - HIPAA Export As Modal Report Scope PDF Format.png",
+"COMPLIANCE TAB/[Interaction] Compliance - HIPAA Export History Panel Previous Records.png",
+"COMPLIANCE TAB/[Interaction] Compliance - HIPAA Overview Settings Dropdown Customize Manage.png",
+"COMPLIANCE TAB/[Interaction] Compliance - Landing Page Edit Mode Pencil Checkmark PCI-DSS Card.png",
+"COMPLIANCE TAB/[Interaction] Compliance - Landing Page View Reports Button PCI-DSS Highlight.png",
+"COMPLIANCE TAB/[Main] Compliance - HIPAA Overview AD Tab with Sidemenu and Line Tab Switcher.png",
+"COMPLIANCE TAB/[Main] Compliance - Landing Page Grid Row 1 PCI-DSS HIPAA FISMA GDPR SOX ISO27001.png",
+"COMPLIANCE TAB/[Main] Compliance - Landing Page Grid Row 2 PDPA NERC NRC CMMC POPIA SAMA.png",
+"COMPLIANCE TAB/[Main] Compliance - Landing Page Grid Row 3 CJIN SOC2 QCF TISAX ECC PDPL.png",
+"COMPLIANCE TAB/[Main] Compliance - Manage Compliance Table with Show Hide Toggles and Actions.png",
+"COMPLIANCE TAB/[Main] Compliance - PCI-DSS All Audit Reports List Logon Logoff Policy Device.png",
+"COMPLIANCE TAB/[Main] Compliance - PCI-DSS Audit Reports Continued Policy Account Firewall Threat.png",
+"COMPLIANCE TAB/[Main] Compliance - PCI-DSS Audit Reports List Full View.png",
+"COMPLIANCE TAB/[Main] Compliance - PCI-DSS Overview AD Tab Classic Tabs Empty State.png",
+"COMPLIANCE TAB/[Main] Compliance - PCI-DSS Overview Unix Tab Pie Bar Charts Logon FTP Threats.png",
+"COMPLIANCE TAB/[Main] Compliance - PCI-DSS Overview Windows Tab Pie Bar Charts Logon Policy Events.png",
+"COMPLIANCE TAB/[Main] Compliance - PCI-DSS User Logons Report Bar Chart Sidemenu Table.png",
+"DASHBOARD TAB/[Interaction] Custom Tab 1 - Dropdown Menu Showing Available Custom Views.png",
+"DASHBOARD TAB/[Interaction] Log Sources - Applications Tab Manage Tooltip.png",
+"DASHBOARD TAB/[Interaction] Log Sources - Devices Tab Export Dropdown (PDF CSV).png",
+"DASHBOARD TAB/[Interaction] Log Sources - Devices Tab Export History Panel.png",
+"DASHBOARD TAB/[Interaction] Log Sources - Devices Tab Manage Devices Tooltip.png",
+"DASHBOARD TAB/[Main] AD Overview - Logon Failure and Account Management.png",
+"DASHBOARD TAB/[Main] AD Summary - Logon Activity User Group GPO Management.png",
+"DASHBOARD TAB/[Main] AWS Overview - Resources and Security Events.png",
+"DASHBOARD TAB/[Main] Anomaly Trends - Recent Anomalies Risk Levels and Detection Stats.png",
+"DASHBOARD TAB/[Main] Cloud Protection - Network Traffic Shadow Apps and Categories.png",
+"DASHBOARD TAB/[Main] Custom Tab 1 - GPO Management and Top Network Devices.png",
+"DASHBOARD TAB/[Main] Detection Overview - Detection Pipeline Tactics and Top Rules.png",
+"DASHBOARD TAB/[Main] Entities - Entity Risk Score Distribution and Watchlisted.png",
+"DASHBOARD TAB/[Main] Events Overview - Main Dashboard with Log Trend and Severity Charts.png",
+"DASHBOARD TAB/[Main] File Monitoring - File Activity Trend and Folder Changes.png",
+"DASHBOARD TAB/[Main] Incident Overview - Incidents MTTR and Recent Incidents.png",
+"DASHBOARD TAB/[Main] Log Sources - Applications Tab with Log Source Types.png",
+"DASHBOARD TAB/[Main] Log Sources - Cloud Sources Tab with Data Fetch Status.png",
+"DASHBOARD TAB/[Main] Log Sources - Devices Tab with Agent Status Table.png",
+"DASHBOARD TAB/[Main] Log Sources - File Integrity Monitoring Tab with Device Status.png",
+"DASHBOARD TAB/[Main] Log Sources - Gateway Clusters Tab with Status.png",
+"DASHBOARD TAB/[Main] Microsoft 365 - M365 Logs and Exchange Admin Activity.png",
+"DASHBOARD TAB/[Main] Network Overview - Traffic Trend and Top Network Devices.png",
+"DASHBOARD TAB/[Main] PostgreSQL Overview - Security Events DML DDL Tables.png",
+"DASHBOARD TAB/[Main] SQL Server Overview - Read Write Security Events.png",
+"DASHBOARD TAB/[Main] Salesforce Overview - Events Top Users and Failed Logins.png",
+"DASHBOARD TAB/[Main] Threat Analytics - Breach Events Dark Web Summary (Active Data).png",
+"DASHBOARD TAB/[Main] Threat Analytics - Breach Trends Dark Web and Botnet.png",
+"DASHBOARD TAB/[Main] Users - User Risk Score Distribution and Watchlisted.png",
+"Incident workbench right bottom componet flow sequence_/[Interaction] Incident Workbench - IP Threat Intel Panel Reputation Score Trends Category Recommendation.png",
+"Incident workbench right bottom componet flow sequence_/[Interaction] Incident Workbench - Process Hunting Flow General Tab Tree View Parent Process Timeline.png",
+"Incident workbench right bottom componet flow sequence_/[Interaction] Incident Workbench - User Activity Overview Account Management Device Software Process Audit.png",
+"LOG ME TAB/[Main] LogMe - Supported Log Sources Grid All Categories Windows Network Cloud Database Security Icons.png",
+"REPORTS TAB/[Interaction] Reports - Active Directory - TopNav Dropdown.png",
+"REPORTS TAB/[Interaction] Reports - Applications - TopNav Dropdown Cloud Apps Zoho.png",
+"REPORTS TAB/[Interaction] Reports - Applications - TopNav Dropdown Log Source Types Grid.png",
+"REPORTS TAB/[Interaction] Reports - Cloud Sources - TopNav Dropdown AWS Salesforce.png",
+"REPORTS TAB/[Interaction] Reports - Custom Reports - TopNav Dropdown Identity Sources.png",
+"REPORTS TAB/[Interaction] Reports - File Integrity Monitoring - TopNav Dropdown.png",
+"REPORTS TAB/[Interaction] Reports - Microsoft 365 - TopNav Dropdown Services List.png",
+"REPORTS TAB/[Interaction] Reports - Network Devices - TopNav Dropdown Vendor List.png",
+"REPORTS TAB/[Interaction] Reports - Servers & Workstation - TopNav Dropdown Windows Unix.png",
+"REPORTS TAB/[Interaction] Reports - Servers & Workstation - Windows - Add to Incident Dropdown Create Options.png",
+"REPORTS TAB/[Interaction] Reports - Servers & Workstation - Windows - All Events Filter Tag Clear Interaction.png",
+"REPORTS TAB/[Interaction] Reports - Servers & Workstation - Windows - All Events Manage Custom Views Button.png",
+"REPORTS TAB/[Interaction] Reports - Servers & Workstation - Windows - Available Schedule Modal Schedule List.png",
+"REPORTS TAB/[Interaction] Reports - Servers & Workstation - Windows - Create Filter Modal Log Source Criteria.png",
+"REPORTS TAB/[Interaction] Reports - Servers & Workstation - Windows - Customize View Modal Sorting Limits Tab.png",
+"REPORTS TAB/[Interaction] Reports - Servers & Workstation - Windows - Customize View Modal Widget Chart Type.png",
+"REPORTS TAB/[Interaction] Reports - Servers & Workstation - Windows - Export As Dropdown PDF CSV XLSX HTML.png",
+"REPORTS TAB/[Interaction] Reports - Servers & Workstation - Windows - Export History Panel Download Links.png",
+"REPORTS TAB/[Interaction] Reports - Servers & Workstation - Windows - More Menu Pin to Dashboard Annotation.png",
+"REPORTS TAB/[Interaction] Reports - Servers & Workstation - Windows - Pin to Dashboard Modal Widget Config.png",
+"REPORTS TAB/[Interaction] Reports - Servers & Workstation - Windows - Select Columns Modal Dialog.png",
+"REPORTS TAB/[Interaction] Reports - Servers & Workstation - Windows - Select Log Source Modal Device Tree.png",
+"REPORTS TAB/[Interaction] Reports - Servers & Workstation - Windows - Table Add Remove Columns Button.png",
+"REPORTS TAB/[Interaction] Reports - Servers & Workstation - Windows - Table Pagination Rows Per Page Dropdown.png",
+"REPORTS TAB/[Interaction] Reports - Threats - TopNav Dropdown Security Sources.png",
+"REPORTS TAB/[Interaction] Reports - VM Management - TopNav Dropdown ESXi HyperV.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Unix - All Events Line Chart Severity Table.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Unix - All Events Overview Sidemenu.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Unix - Important Events Summary Table.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Unix - SU Logons Top Devices Bar Chart Table.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Unix - Top Logons by Users Line Chart Percentage Table.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Unix - User Logons Empty State No Data.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - All Events Default Baseline State.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - All Events List View Checkboxes Full Sidemenu.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - All Events List View Inline Fields.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - All Events Table View with Line Chart.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu All Events Overview.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu Application Crashes Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu Application Whitelisting Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu Backup and Restore Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu DNS Server Expanded Alt.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu DNS Server Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu Device Severity Reports Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu Eventlog Reports Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu Failed Logon Reports Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu Firewall Auditing Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu Group Management Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu Important Events Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu Local Account Management Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu Logoff Reports Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu Logon Reports Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu Network Policy Server Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu Network Share Auditing Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu Policy Changes Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu Powershell Auditing Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu Process Tracking Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu Program Inventory Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu Registry Changes Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu Service Audit Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu Startup Events Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu System Events Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu Threat Detection Antivirus Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu Threat Detection Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu USB Storage Auditing Expanded.png",
+"REPORTS TAB/[Main] Reports - Servers & Workstation - Windows - Sidemenu Wireless Network Reports Expanded.png",
+"SEARCH TAB/[Interaction] Search - Criteria Modal Severity Equals Emergency Filter Builder.png",
+"SEARCH TAB/[Interaction] Search - Log Types Dropdown All Windows Unix Cisco Device.png",
+"SEARCH TAB/[Interaction] Search - More Menu Dropdown with Saved Search Option.png",
+"SEARCH TAB/[Interaction] Search - Save As Dropdown Save Search Save as Alert Save as Rule.png",
+"SEARCH TAB/[Interaction] Search - Select Log Source Modal Group Tree with Device Checkboxes.png",
+"SEARCH TAB/[Main] Search - Landing Page Basic Advanced Query Box with Help Card.png",
+"SEARCH TAB/[Main] Search - Results Page Bar Chart Severity Emergency Log List View.png",
+"SEARCH TAB/[Main] Search - Results Page with Add to Incident and Extract Fields Toolbar.png",
+"SUPPORT TAB/[Main] Support - Get in Touch Cards Request Live Chat Store Contact Forum Posts Announcements.png",
+"Security TAB/[Interaction] Security - Create Rule Dropdown Standard Anomaly Advanced Options.png",
+"Security TAB/[Interaction] Security - Create Schedule Form Frequency Time Range Format Rule.png",
+"Security TAB/[Interaction] Security - Manage Rules Dropdown Import Export Enable Disable Update.png",
+"Security TAB/[Interaction] Security - Manage Rules Filter Dropdown State Label New Deprecated.png",
+"Security TAB/[Interaction] Security - Rule Library Installed Rules Label Filter All New Deprecated.png",
+"Security TAB/[Interaction] Security - Rule Library Settings Auto Install Rules Severity Popup.png",
+"Security TAB/[Main] Security - Analytics Dashboard Detection Pipeline MITRE Tactics Trends.png",
+"Security TAB/[Main] Security - Manage Rules Table with MITRE Mapping Severity Tags Profiles.png",
+"Security TAB/[Main] Security - Rule Library Installed Rules Tab with MITRE Mapping Table.png",
+"Security TAB/[Main] Security - Rule Library Sidemenu All Vendors Available Rules Tab.png",
+"Security TAB/[Main] Security - Scheduled Detection Reports Empty State No Schedule.png",
+"Settings TAB/[Interaction] Settings - Account Management Configure Domains Table Audit Sync.png",
+"Settings TAB/[Interaction] Settings - Add Storage Tier Form Log Types Sources Retention.png",
+"Settings TAB/[Interaction] Settings - Agent Administration Access Key Modal Regenerate.png",
+"Settings TAB/[Interaction] Settings - Agent Administration Download Agent Modal Prerequisites.png",
+"Settings TAB/[Interaction] Settings - Agent Settings Offline Collection Toggle Max Size Form.png",
+"Settings TAB/[Interaction] Settings - Device Management Add Device Modal ESXi Log Source Form.png",
+"Settings TAB/[Interaction] Settings - Device Management Syslog Devices Refresh IP Tooltip.png",
+"Settings TAB/[Interaction] Settings - Device Management Windows Devices Category Filter Dropdown.png",
+"Settings TAB/[Interaction] Settings - Device Management Windows Devices Monitor Interval Toolbar.png",
+"Settings TAB/[Interaction] Settings - File Integrity Monitoring Add FIM Form Log Source Agent.png",
+"Settings TAB/[Interaction] Settings - File Integrity Monitoring Templates Form Name Locations.png",
+"Settings TAB/[Interaction] Settings - Log Forwarding Architecture Diagram to Amazon S3.png",
+"Settings TAB/[Interaction] Settings - Notification Template Preview Modal Schedule Export Email.png",
+"Settings TAB/[Interaction] Settings - Zia Configuration Confirm Switch Service Modal.png",
+"Settings TAB/[Main] Settings - Agent Administration Windows Tab Agents Table Status.png",
+"Settings TAB/[Main] Settings - Banned Cloud Applications Table Name IP Category Reputation.png",
+"Settings TAB/[Main] Settings - Certificate Authorities Table Expiry Cluster List.png",
+"Settings TAB/[Main] Settings - Cloud Sources Microsoft 365 Tab Tenant Data Source Table.png",
+"Settings TAB/[Main] Settings - Custom Log Format Table Format Names Types Parser Rules.png",
+"Settings TAB/[Main] Settings - Custom Widgets Table Names Types Sources Details.png",
+"Settings TAB/[Main] Settings - Device Management Other Devices Table IP Agent Status.png",
+"Settings TAB/[Main] Settings - Device Management Syslog Devices Table Auto Log Forward.png",
+"Settings TAB/[Main] Settings - Device Management Windows Devices Table IP Agent Status.png",
+"Settings TAB/[Main] Settings - Extension Profiles Table Download Links Share Steps.png",
+"Settings TAB/[Main] Settings - File Integrity Monitoring Windows Tab Device Agent Table.png",
+"Settings TAB/[Main] Settings - Gateway Configuration Cluster Details Server Table.png",
+"Settings TAB/[Main] Settings - Import Log Files Table File Name Format Status Report.png",
+"Settings TAB/[Main] Settings - License Page Storage Stats Feature Table Usage Bars.png",
+"Settings TAB/[Main] Settings - Listener Ports Table Port Protocol Agent Counts.png",
+"Settings TAB/[Main] Settings - Log Collection Filters Table Filter Names Devices.png",
+"Settings TAB/[Main] Settings - Log Source Groups Table Description Source Counts.png",
+"Settings TAB/[Main] Settings - MarketPlace Installed Extensions Table Config Status.png",
+"Settings TAB/[Main] Settings - My Account Profile Settings Organization Info.png",
+"Settings TAB/[Main] Settings - Notification Settings Table Email SMS Enabled Status.png",
+"Settings TAB/[Main] Settings - Privacy Settings GDPR Consent and Password Protection.png",
+"Settings TAB/[Main] Settings - Product Settings General and Notifications Form Fields.png",
+"Settings TAB/[Main] Settings - Sanctioned Cloud Applications Table IP Category Reputation.png",
+"Settings TAB/[Main] Settings - Storage Tiers Bar Chart Archival Search Table.png",
+"Settings TAB/[Main] Settings - Storage Tiers Bar Chart Table Full Sidemenu Expanded.png",
+"Settings TAB/[Main] Settings - Tags Table Tag Names Criteria Search Logs Tooltip.png",
+"Settings TAB/[Main] Settings - Technician Audit Log Table Module Operation Status.png",
+"Settings TAB/[Main] Settings - Threat Management Default Threat Server Tab.png",
+"Settings TAB/[Main] Settings - User Management Table Username Email Access Levels.png",
+"Settings TAB/[Main] Settings - Working Hour Settings Form Day Selector Hour Range.png",
+"Settings TAB/[Main] Settings - Zia AI Configuration Azure OpenAI and OpenAI Cards.png",
+"TOP BLOCKED COUNTRIES/[Main] Top Blocked Countries - Firewall Bar Chart with Country Request Count Table.png",
+];
+
+const SCREENSHOT_BASE = `https://raw.githubusercontent.com/${PRIVATE_REPO}/main/data/LOG360%20Cloud%20Full%20Product%20Bulk%20Screenshot_`;
+
+function handleGetScreenshot(args: { query: string; max_results?: number }): string {
+  const keywords = args.query.toLowerCase().split(/[\s,]+/).filter(Boolean);
+  const max = args.max_results || 5;
+
+  const scored = SCREENSHOTS.map(s => {
+    const lower = s.toLowerCase();
+    let score = 0;
+    for (const kw of keywords) {
+      if (lower.includes(kw)) score++;
+    }
+    return { path: s, score };
+  }).filter(r => r.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, max);
+
+  if (scored.length === 0) {
+    return `No screenshots found for "${args.query}".\n\nTip: Try broader keywords. Available tabs: ALERTS, COMPLIANCE, DASHBOARD, REPORTS, SEARCH, Security, Settings, CLOUD PROTECTION.\nExample keywords: "windows startup", "alerts main", "dashboard events", "settings device", "compliance landing"`;
+  }
+
+  const lines = scored.map((r, i) => {
+    const encoded = r.path.split('/').map(p => encodeURIComponent(p)).join('/');
+    const url = `${SCREENSHOT_BASE}/${encoded}`;
+    return `${i + 1}. **${r.path}**\n   URL: ${url}\n   Local: data/LOG360 Cloud Full Product Bulk Screenshot_/${r.path}`;
+  });
+
+  return `Found ${scored.length} screenshot(s) for "${args.query}":\n\n${lines.join("\n\n")}\n\n⚠️ These are real product screenshots from the private repo.\n- The filenames describe exactly what each screenshot shows.\n- Use get_page_blueprint for the structured layout description.\n- Match these layouts exactly — component positions, spacing, colors, data density.`;
+}
 
 /* ══════════════════════════════════════════════════════
    TOOL HANDLERS
@@ -1824,6 +2080,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case "setup_project":     text = handleSetupProject(args as { feature_name: string }); break;
       case "get_topnavbar":     text = await handleGetTopnavbar(); break;
       case "get_page_blueprint": text = handleGetPageBlueprint(args as { page: string }); break;
+      case "get_screenshot":    text = handleGetScreenshot(args as { query: string; max_results?: number }); break;
       default: text = `Unknown tool: ${name}`;
     }
 
