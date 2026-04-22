@@ -24,7 +24,10 @@ import {
   Tool,
 } from "@modelcontextprotocol/sdk/types.js";
 const CDN_BASE = "https://cdn.jsdelivr.net/gh/Anguraj-zoho/elegant-cdn@main";
-const WIKI_CDN = `${CDN_BASE}/Components-Wiki`;
+
+const PRIVATE_REPO = "Anguraj-zoho/elegant-2.0";
+const WIKI_PATH = "data/Components-Wiki";
+const GH_TOKEN = process.env.ELEGANT_GH_TOKEN || "";
 
 /* In-memory cache so we only fetch each wiki file once per session */
 const wikiCache = new Map<string, string>();
@@ -33,19 +36,28 @@ const wikiCache = new Map<string, string>();
    HELPERS
 ══════════════════════════════════════════════════════ */
 
-/** Fetch a wiki .md file from CDN (cached) */
+/** Fetch a wiki .md file from private GitHub repo (cached) */
 async function readWikiFile(filename: string): Promise<string> {
   const name = filename.endsWith(".md") ? filename : `${filename}.md`;
   if (wikiCache.has(name)) return wikiCache.get(name)!;
+
+  if (!GH_TOKEN) return `[ERROR: ELEGANT_GH_TOKEN env var not set. Create a fine-grained token at github.com/settings/tokens]`;
+
   try {
-    const url = `${WIKI_CDN}/${name}`;
-    const res = await fetch(url);
-    if (!res.ok) return `[File not found on CDN: ${name} (${res.status})]`;
+    const url = `https://api.github.com/repos/${PRIVATE_REPO}/contents/${WIKI_PATH}/${name}`;
+    const res = await fetch(url, {
+      headers: {
+        "Authorization": `Bearer ${GH_TOKEN}`,
+        "Accept": "application/vnd.github.raw+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+      },
+    });
+    if (!res.ok) return `[Wiki file not found: ${name} (${res.status})]`;
     const text = await res.text();
     wikiCache.set(name, text);
     return text;
   } catch (err) {
-    return `[CDN fetch error: ${err instanceof Error ? err.message : String(err)}]`;
+    return `[GitHub fetch error: ${err instanceof Error ? err.message : String(err)}]`;
   }
 }
 

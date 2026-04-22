@@ -1,1 +1,1 @@
-{"mcpServers":{"elegant-mcp":{"command":"node","args":["dist/index.js"],"env":{}}}}
+{"mcpServers":{"elegant-mcp":{"command":"node","args":["dist/index.js"],"env":{"ELEGANT_GH_TOKEN":"YOUR_GITHUB_PAT_HERE"}}}}

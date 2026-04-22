@@ -13,9 +13,19 @@ npm install
 npm run build
 ```
 
+## GitHub Token (Required)
+
+The server needs a **GitHub Personal Access Token** to fetch component wiki docs.
+
+1. Go to https://github.com/settings/personal-access-tokens/new
+2. Create a **fine-grained token** with:
+   - Repository access: **Only select repositories** → `Anguraj-zoho/elegant-2.0`
+   - Permissions: **Contents** → Read-only
+3. Copy the token and set it in your MCP config (see below)
+
 ## Use with Cursor
 
-Open the `elegant-mcp` folder in Cursor. The `.cursor/mcp.json` is already configured.
+Open the `elegant-mcp` folder in Cursor. Edit `.cursor/mcp.json` and replace `YOUR_GITHUB_PAT_HERE` with your token.
 
 Or add this to any project's `.cursor/mcp.json`:
 
@@ -25,7 +35,9 @@ Or add this to any project's `.cursor/mcp.json`:
     "elegant-mcp": {
       "command": "node",
       "args": ["/FULL/PATH/TO/elegant-mcp/dist/index.js"],
-      "env": {}
+      "env": {
+        "ELEGANT_GH_TOKEN": "YOUR_GITHUB_PAT_HERE"
+      }
     }
   }
 }
@@ -41,7 +53,9 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
     "elegant-mcp": {
       "command": "node",
       "args": ["/FULL/PATH/TO/elegant-mcp/dist/index.js"],
-      "env": {}
+      "env": {
+        "ELEGANT_GH_TOKEN": "YOUR_GITHUB_PAT_HERE"
+      }
     }
   }
 }
