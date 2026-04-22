@@ -1,33 +1,26 @@
 # Elegant MCP Server
 
-MCP server for Elegant 1.0 design system — 12 tools for AI-assisted UI generation.
+MCP server for **Elegant 1.0 design system** — 12 tools for AI-assisted UI generation.
 
-All CSS, JS, SVG icons, and fonts are served from CDN. Output is a **single `index.html`** file.
+All CSS, JS, SVG icons, and fonts load from CDN. Output is a **single `index.html`** file.
 
-## Setup
+---
+
+## Quick Start (3 steps)
+
+### Step 1 — Clone & Install
 
 ```bash
 git clone https://github.com/Anguraj-zoho/elegant-mcp.git
 cd elegant-mcp
 npm install
-npm run build
 ```
 
-## GitHub Token (Required)
+### Step 2 — Add Token
 
-The server needs a **GitHub Personal Access Token** to fetch component wiki docs.
+Open `.cursor/mcp.json` inside the `elegant-mcp` folder and replace `YOUR_GITHUB_PAT_HERE` with the token provided to you.
 
-1. Go to https://github.com/settings/personal-access-tokens/new
-2. Create a **fine-grained token** with:
-   - Repository access: **Only select repositories** → `Anguraj-zoho/elegant-2.0`
-   - Permissions: **Contents** → Read-only
-3. Copy the token and set it in your MCP config (see below)
-
-## Use with Cursor
-
-Open the `elegant-mcp` folder in Cursor. Edit `.cursor/mcp.json` and replace `YOUR_GITHUB_PAT_HERE` with your token.
-
-Or add this to any project's `.cursor/mcp.json`:
+If you want to use it in **another project**, add this to that project's `.cursor/mcp.json`:
 
 ```json
 {
@@ -36,14 +29,31 @@ Or add this to any project's `.cursor/mcp.json`:
       "command": "node",
       "args": ["/FULL/PATH/TO/elegant-mcp/dist/index.js"],
       "env": {
-        "ELEGANT_GH_TOKEN": "YOUR_GITHUB_PAT_HERE"
+        "ELEGANT_GH_TOKEN": "PASTE_TOKEN_HERE"
       }
     }
   }
 }
 ```
 
-## Use with Claude Desktop
+### Step 3 — Open in Cursor & Test
+
+1. Open the `elegant-mcp` folder in **Cursor**
+2. Cursor will detect `.cursor/mcp.json` and start the MCP server automatically
+3. You should see **"elegant-mcp"** listed in the MCP panel (Settings > MCP)
+4. Start a new chat and paste this test prompt:
+
+```
+Build me a Windows Startup report page using Shell C.
+Call setup_project first, then use get_recipe, get_shell, and get_component tools.
+```
+
+> The AI will call tools → get CDN-linked HTML skeletons → produce a single `index.html`.
+> Open that file in a browser — all CSS, JS, icons, and fonts load from CDN automatically.
+
+---
+
+## Claude Desktop (Optional)
 
 Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
@@ -54,12 +64,14 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
       "command": "node",
       "args": ["/FULL/PATH/TO/elegant-mcp/dist/index.js"],
       "env": {
-        "ELEGANT_GH_TOKEN": "YOUR_GITHUB_PAT_HERE"
+        "ELEGANT_GH_TOKEN": "PASTE_TOKEN_HERE"
       }
     }
   }
 }
 ```
+
+---
 
 ## Available Tools (12)
 
@@ -78,9 +90,9 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 | `get_icons` | 195 SVG icon filenames (with CDN URLs) |
 | `get_full_wiki_file` | Complete wiki .md file content |
 
-## Test Prompt
+---
 
-```
-Build me a Windows Startup report page using Shell C.
-Call setup_project first, then use get_recipe, get_shell, and get_component tools.
-```
+## Requirements
+
+- **Node.js** 18+ (check: `node -v`)
+- **Cursor IDE** (latest version with MCP support)
