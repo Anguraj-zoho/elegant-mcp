@@ -7,26 +7,33 @@ const PRIVATE_REPO = "Anguraj-zoho/elegant-2.0";
 const WIKI_PATH = "data/Components-Wiki";
 const GH_TOKEN = process.env.ELEGANT_GH_TOKEN || "";
 
-/* ── Wiki file reader (GitHub API) ── */
-const wikiCache = new Map<string, string>();
+/* ── Wiki file reader (GitHub API) with 5-minute TTL cache ── */
+const WIKI_CACHE_TTL_MS = 5 * 60 * 1000;
+const wikiCache = new Map<string, { text: string; fetchedAt: number }>();
 
 async function readWikiFile(filename: string): Promise<string> {
   const name = filename.endsWith(".md") ? filename : `${filename}.md`;
-  if (wikiCache.has(name)) return wikiCache.get(name)!;
+  const cached = wikiCache.get(name);
+  if (cached && Date.now() - cached.fetchedAt < WIKI_CACHE_TTL_MS) {
+    return cached.text;
+  }
   if (!GH_TOKEN)
     return `[ERROR: ELEGANT_GH_TOKEN env var not set]`;
   try {
+    // Cache-bust GitHub API with a timestamp parameter on cold miss
     const url = `https://api.github.com/repos/${PRIVATE_REPO}/contents/${WIKI_PATH}/${name}`;
     const res = await fetch(url, {
       headers: {
         Authorization: `Bearer ${GH_TOKEN}`,
         Accept: "application/vnd.github.raw+json",
         "X-GitHub-Api-Version": "2022-11-28",
+        "Cache-Control": "no-cache",
       },
+      cache: "no-store" as RequestCache,
     });
     if (!res.ok) return `[Wiki file not found: ${name} (${res.status})]`;
     const text = await res.text();
-    wikiCache.set(name, text);
+    wikiCache.set(name, { text, fetchedAt: Date.now() });
     return text;
   } catch (err: any) {
     return `[GitHub fetch error: ${err.message}]`;

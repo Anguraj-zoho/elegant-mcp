@@ -22,16 +22,19 @@ const CDN_BASE = "https://cdn.jsdelivr.net/gh/Anguraj-zoho/elegant-cdn@main";
 const PRIVATE_REPO = "Anguraj-zoho/elegant-2.0";
 const WIKI_PATH = "data/Components-Wiki";
 const GH_TOKEN = process.env.ELEGANT_GH_TOKEN || "";
-/* In-memory cache so we only fetch each wiki file once per session */
+/* In-memory cache with 5-minute TTL so content updates propagate */
+const WIKI_CACHE_TTL_MS = 5 * 60 * 1000;
 const wikiCache = new Map();
 /* ══════════════════════════════════════════════════════
    HELPERS
 ══════════════════════════════════════════════════════ */
-/** Fetch a wiki .md file from private GitHub repo (cached) */
+/** Fetch a wiki .md file from private GitHub repo (5-min TTL cache) */
 async function readWikiFile(filename) {
     const name = filename.endsWith(".md") ? filename : `${filename}.md`;
-    if (wikiCache.has(name))
-        return wikiCache.get(name);
+    const cached = wikiCache.get(name);
+    if (cached && Date.now() - cached.fetchedAt < WIKI_CACHE_TTL_MS) {
+        return cached.text;
+    }
     if (!GH_TOKEN)
         return `[ERROR: ELEGANT_GH_TOKEN env var not set. Create a fine-grained token at github.com/settings/tokens]`;
     try {
@@ -41,12 +44,14 @@ async function readWikiFile(filename) {
                 "Authorization": `Bearer ${GH_TOKEN}`,
                 "Accept": "application/vnd.github.raw+json",
                 "X-GitHub-Api-Version": "2022-11-28",
+                "Cache-Control": "no-cache",
             },
+            cache: "no-store",
         });
         if (!res.ok)
             return `[Wiki file not found: ${name} (${res.status})]`;
         const text = await res.text();
-        wikiCache.set(name, text);
+        wikiCache.set(name, { text, fetchedAt: Date.now() });
         return text;
     }
     catch (err) {
