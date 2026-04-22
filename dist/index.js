@@ -495,18 +495,18 @@ const SHELLS = {
         <!-- actionbar Type 8 (sticky) -->
         <div class="actionbar">
           <div class="actionbar__left">
-            <button class="actionbar__icon-btn" title="Search"><img src="assets/icons/icon-ab-search.svg" alt="" style="width:14px;height:14px;" /></button>
+            <button class="actionbar__icon-btn" title="Search"><img src="${CDN_BASE}/assets/icons/icon-ab-search.svg" alt="" style="width:14px;height:14px;" /></button>
             <div class="actionbar__separator"></div>
             <button class="actionbar__btn-report" onclick="ElegantDrawer&&ElegantDrawer.open('incidentWorkbenchDrawer')">
-              <img src="assets/icons/icon-ab-plus.svg" alt="" /><span>Incident</span>
+              <img src="${CDN_BASE}/assets/icons/icon-ab-plus.svg" alt="" /><span>Incident</span>
             </button>
           </div>
           <div class="actionbar__right">
             <span class="actionbar__pagination">1-50 <i>of</i> <b><!-- TOTAL --></b></span>
-            <button class="actionbar__nav-btn"><img src="assets/icons/icon-ab-arrow-left.svg" alt="" /></button>
-            <button class="actionbar__nav-btn"><img src="assets/icons/icon-ab-arrow-right.svg" alt="" /></button>
+            <button class="actionbar__nav-btn"><img src="${CDN_BASE}/assets/icons/icon-ab-arrow-left.svg" alt="" /></button>
+            <button class="actionbar__nav-btn"><img src="${CDN_BASE}/assets/icons/icon-ab-arrow-right.svg" alt="" /></button>
             <div class="actionbar__separator"></div>
-            <button class="actionbar__icon-btn" onclick="ElegantDrawer&&ElegantDrawer.open('selectColumnsDrawer')"><img src="assets/icons/icon-ab-column.svg" alt="" style="width:14px;height:14px;" /></button>
+            <button class="actionbar__icon-btn" onclick="ElegantDrawer&&ElegantDrawer.open('selectColumnsDrawer')"><img src="${CDN_BASE}/assets/icons/icon-ab-column.svg" alt="" style="width:14px;height:14px;" /></button>
           </div>
         </div>
         <!-- data-table-wrap -->
@@ -517,7 +517,7 @@ const SHELLS = {
               <!-- SLOT: cols (no width = proportional) -->
             </colgroup>
             <thead><tr>
-              <th class="cell-checkbox" data-checked="unchecked"><img src="assets/icons/icon-checkbox.svg" alt="" style="width:14px;height:14px;" /></th>
+              <th class="cell-checkbox" data-checked="unchecked"><img src="${CDN_BASE}/assets/icons/icon-checkbox.svg" alt="" style="width:14px;height:14px;" /></th>
               <!-- SLOT: th headers -->
             </tr></thead>
             <tbody><!-- SLOT: rows --></tbody>
