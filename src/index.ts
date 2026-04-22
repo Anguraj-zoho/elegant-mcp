@@ -1091,13 +1091,19 @@ const TOOLS: Tool[] = [
           enum: [
             "reports-windows-all-events",
             "reports-windows-startup",
-            "reports-windows-logon",
             "reports-unix-all-events",
             "dashboard",
+            "dashboard-network",
             "alerts",
+            "alerts-manage-profiles",
             "compliance",
+            "compliance-report",
             "search",
+            "security",
+            "cloud-protection",
             "settings",
+            "settings-license",
+            "incident-workbench",
           ],
         },
       },
@@ -1430,72 +1436,356 @@ Total rows: ~260 (show "1-50 of 260" in pagination)`,
 "reports-unix-all-events": `# Blueprint: Reports > Servers & Workstation > Unix > All Events
 
 ## Layout (Shell C)
-Same shell as Windows but OS dropdown in sidemenu set to "Unix/Linux".
+Same shell as Windows reports but OS dropdown in sidemenu set to "Unix/Linux".
 
 ## Sidemenu
-OS dropdown: Unix/Linux (selected)
-Sections change to Unix-specific: All Events | Important Events | SU Logons | Logon Reports | Failed Logon Reports | ...
+OS dropdown: Unix/Linux (selected — icon changes to penguin/terminal icon)
+Sections change to Unix-specific:
+- All Events (highlighted by default)
+- Important Events
+- SU Logons
+- Logon Reports >
+- Failed Logon Reports >
+- System Events >
+- Terminal Service Session >
+- FTP Server Reports >
 
-## Classic Tab
-Tab headers: All Events | Top Source | Top Devices | Time Based View
-Chart: Line chart with severity breakdown
+Bottom links: Scheduled Reports | Manage Reports | Need New Reports?
+
+## Page Header (header-v3)
+Title: "All Events" + help icon
+Right buttons: Edit Report | Export As ▾ | Schedule Reports | More ▾
+
+## Input Row
+Fields: Select Log Source [dropdown] | Period [date range picker] | [Generate button blue]
+
+## Classic Tab (chart toggle)
+Tab headers: All Events (selected) | Top Source | Top Devices | Time Based View
+ONE chart area with rpt-chart-floater. Line chart with severity breakdown.
+Legend: ● Error ● Warning ● Information ● Success ● Failure
 
 ## Table
-Columns similar to Windows but with Unix-specific event data.`,
+ActionBar: list/table view toggle | Incident | pagination | columns
+Columns: [checkbox] | Source | Log Source | Severity | Event ID | Display Name | Source | Timestamp
+Row data: Unix syslog entries with severity levels.`,
 
-"dashboard": `# Blueprint: Dashboard (Shell A)
+"dashboard": `# Blueprint: Dashboard — Events Overview (Shell A)
 
 ## Layout (Shell A)
 TopNavBar → data-active-tab="Home"
-No sidemenu. Full-width main content.
-Content: stat-cards row + widget grid (2×2 or 3×2) with charts and tables.
+QuickLink bar (line-tab below topnavbar): Events Overview (selected) | Network Overview | AD Overview | AWS Overview | Microsoft 365 | File Monitoring | Incident Overview | PgSQL Overview | SQL Server Overview | AD Summary | Threat Analytics | Cloud Protection | Custom Tab 1
+No sidemenu. Full-width scrollable main content.
+Date range picker in top-right corner.
 
-## Stat Cards Row (4 cards)
-- Total Events (number, blue)
-- Critical (number, red)
-- Warning (number, orange)
-- Information (number, green)
+## Stat Cards Row (4 cards, horizontal)
+1. All Events: "4489K" with delta "▲ 4441,946 (3406.52%)" — blue icon (bar chart)
+2. Windows Events: "3302K" with sub-stats "▲ 330251 ● Failure 4556 ● Error 1895 ● Warning 778" — blue icon
+3. Syslog Events: "11444" with delta "▲ 9942 (471.63%)" sub-stats "● Warning 462 ● Critical 143 ● Error 18" — green icon
+4. All Log Sources: "18" with link "View All Log Sources" + "2 Inactive Devices" — purple icon
 
-## Widget Grid
-Each widget uses the widget component with header + chart or table inside.
-Typical widgets: Event Trend (line chart), Top Sources (bar chart), Severity Distribution (donut chart), Recent Alerts (table).`,
+## Widget Grid (2 columns, 3 rows)
+### Row 1:
+- LEFT WIDE: "Log Trend" — area chart (blue fill, x-axis: months Dec–Nov, y-axis: count 0–5C)
+- RIGHT NARROW: "Recent Alerts" — scrollable list of alert entries, each with colored left border (red=critical), message text, timestamp
 
-"alerts": `# Blueprint: Alerts (Shell D)
+### Row 2:
+- LEFT: "Security Events" — simple 2-column table: Report Name | Count (Logon: 321174, Account Logon: 12046, Account Management: 66, Object Access: 1893203, System Events: 439)
+- MIDDLE: "Top 5 Log Sources" — donut/pie chart with legend (Server, Salesforce, logauto-dc, dineshrv.dc, mistryiv-10166)
+- RIGHT: (part of Recent Alerts continuing)
 
-## Layout (Shell D - Split Panel)
+### Row 3:
+- LEFT: "Windows Severity Events" — bar chart (x-axis: success/information/failure/error/warning, y-axis: count to 5C)
+- RIGHT: "Syslog Severity Events" — bar chart (x-axis: information/notice/warning/critical/debug/error/alert/emergency, y-axis: count)
+
+## Key Rules
+- Each widget uses the \`widget\` component (widget header + widget body)
+- Charts use ElegantEChart.* calls
+- All stat card numbers should be realistic large numbers
+- "Recent Alerts" is a live feed list, not a table
+- Incident Workbench floating button at bottom-right`,
+
+"dashboard-network": `# Blueprint: Dashboard — Network Overview
+
+## Layout (Shell A)
+Same as Events Overview but "Network Overview" tab selected in quicklink bar.
+Stat cards + widget grid for network-specific data (traffic, devices, top talkers).`,
+
+"alerts": `# Blueprint: Alerts (Shell D — no sidemenu)
+
+## Layout
 TopNavBar → data-active-tab="Alerts"
-No sidemenu. Stat cards row + table + right-side detail drawer.
+Line-tab below TopNavBar: Alerts (selected) | Incident
+No sidemenu — full-width content.
+Date range picker in top-right.
+Right actions: Export As ▾ | 🔔 Add Alert Profile | ⚙ Manage Profiles
 
-## Stat Cards
-4 severity stat cards: Critical | Trouble | Attention | Information (with counts)
+## Filter Row
+"View:" dropdown → "All Alerts ▾" (options: All, Critical, Trouble, Attention)
+"T" filter icon for additional filtering
+
+## Stat Cards Row (4 horizontal)
+1. Critical Alerts: "184185" — red circle icon with X
+2. Trouble Alerts: "6942" — orange circle icon with X
+3. Attention Alerts: "222" — yellow/green circle icon with !
+4. All Alerts: "191349" — blue/purple circle icon (highlighted background)
+
+## Table (NO classic-tab, NO chart — directly below stat cards)
+ActionBar: pagination "1-10 of 191349" [< >] [10 ▾] | Add/Remove Columns
+Columns: [checkbox] | Severity | Profile Name | Time ▾ | Alert Message Format | Log Source
+Row data pattern:
+- Severity: "Critical" with red dot icon
+- Profile Name: "EXE Process Executed", "Logon on Critical Servers"
+- Time: "2026-04-18 01:30:46"
+- Alert Message Format: "microsoft-windows-security-auditing : A new process has b..." or "An account was succ..."
+- Log Source: "server"
+
+## Key Rules
+- Severity column shows colored severity label (Critical=red, Trouble=orange, Attention=yellow)
+- Each row is clickable → opens detail drawer
+- NO chart on this page — stat cards go directly to table
+- Incident Workbench floating button at bottom-right`,
+
+"alerts-manage-profiles": `# Blueprint: Alerts > Manage Profiles
+
+## Layout
+Same TopNavBar + line-tab as alerts. Content area shows profile management table.
 
 ## Table
-Columns: [checkbox] | Alert Name | Severity | Message Format | Log Source | Generated | Status
-Rows: Alert entries with realistic names like "EXE Process Executed", "Failed Logon Attempt", etc.
+Columns: [checkbox] | Alert Type | Severity | Message | Log Source | Action
+CRUD operations: Add/Edit/Delete alert profiles.`,
 
-## Detail Drawer (right panel)
-Opens on row click. Shows: Alert title, MITRE mapping, Investigation panel, Timeline, Affected Entities.`,
-
-"compliance": `# Blueprint: Compliance (Shell C variant)
+"compliance": `# Blueprint: Compliance — Landing Page (Shell A variant — no sidemenu)
 
 ## Layout
 TopNavBar → data-active-tab="Compliance"
-Opening page: Grid of compliance standards with icons (PCI-DSS, HIPAA, SOX, GDPR, FISMA, etc.)
-Each card: Icon + standard name + description + "View Reports" button.`,
+Search bar at top-left: "Search Compliance"
+"Manage Compliance" link at top-right
+Title: "Configured Compliance"
+No sidemenu — full-width grid layout.
 
-"search": `# Blueprint: Search (Shell B)
+## Compliance Grid (3 columns × N rows)
+Each card contains:
+- Icon (compliance standard logo — use placeholder colored circle or shield icon)
+- Title bold: "PCI-DSS" / "HIPAA" / "FISMA" etc.
+- Subtitle: "Compliance Standard"
+- Description: 2-3 lines of text explaining the standard
+- "View Reports" button (outlined, primary blue)
+
+### Row 1: PCI-DSS | HIPAA | FISMA
+### Row 2: GDPR | SOX | ISO 27001:2013
+### Row 3: ISO 27001:2022 | CCPA and CPRA | Cyber Essentials
+### Row 4: COCO | FERPA | GLBA
+### Row 5: GPG | ISLP | NIST CSF
+### Row 6: PDPA | NERC | NRC (partially visible)
+
+## Key Rules
+- Cards have white background, subtle border, consistent padding
+- Logo/icon is top-left of each card (32×32 or 40×40)
+- "View Reports" button navigates to compliance report detail page
+- Incident Workbench floating button at bottom-right`,
+
+"compliance-report": `# Blueprint: Compliance > PCI-DSS > Report Page (Shell C)
+
+## Layout (Shell C)
+TopNavBar → data-active-tab="Compliance"
+Line-tab below topnavbar (compliance standards): PCI-DSS (selected) | HIPAA | FISMA | GDPR | SOX | ISO 27001:2013 | ISO 27001:2022 | CCPA and CPRA | Cyber Essentia... | COCO | FERPA | GLBA | GPG | ISLP | NIST CSF | PDPA | SAMA | CJIN
+Sidemenu Type 2 on left: ← PCI-DSS back arrow + flat accordion sections
+Main content: header + bar chart + table
+
+## Sidemenu (flat accordion with chevron-right)
+Sections:
+- Windows Logon Reports > (expanded: User Logons, Network Logons, Interactive Logon, Remote Interactive Logon, Logon Attempt Using explicit Crede..., Passcode Assigned to New Logon, Radius Logon History/NPS)
+- Windows Logoff Reports >
+- Windows Failed Logon Reports >
+- Terminal Service Session >
+- Policy Changes >
+- System Events >
+- User Account Validation >
+- Windows USB Storage Auditing >
+- Windows Services >
+- Windows Threat Detection from An... >
+- Windows Threat Detection >
+- Windows Application Whitelisting >
+- Ad Indicators >
+- Windows Application Crashes >
+- Windows Wireless Network Reports >
+- Windows Registry Changes >
+- Windows User Access >
+- Group Account Changes >
+
+Bottom link: Manage Compliance
+
+## Page Header
+"← PCI-DSS" back link + Title: "User Logons"
+Right: Export As ▾ | date range
+
+## Input Row
+Devices: [dropdown with tags "DefaultGroup,WindowsGroup,Uni..."] [+] button
+Period: [date range picker]
+
+## Chart Area (NO classic-tab toggle — single horizontal bar chart)
+Horizontal bar chart showing logon counts by source (Server: ~350, logon-N-1: ~5, workstation: ~1)
+
+## Table
+ActionBar: list/table view toggle | pagination "1-10 of 299" [< >] [10 ▾] | columns
+Columns: [checkbox] | Time | Log Source | User Name | Remote Device | Remote Domain(y) | Domain | Logon Type | Process Id
+Row data: "2026-04-18 01:30:13 | server | dwm1-4 | - | - | font driver host | 2 | 0x1988"`,
+
+"search": `# Blueprint: Search (no shell — custom layout)
 
 ## Layout
 TopNavBar → data-active-tab="Search"
-Full-width search bar at top.
-Results area below with filters on left and results table on right.`,
+No sidemenu — full-width content.
+Title: "Search" with help icon "How To Search?"
+Right: Export As ▾ | calendar icon
+Date range picker top-right
 
-"settings": `# Blueprint: Settings (Shell B)
+## Search Box Area (white card, prominent)
+Row 1: [🔍 search input "Type Source / Group Name(s)"] | "Pick Log Source" link (blue) | [All Log Types ▾ dropdown]
+Row 2: Basic (selected) | Advanced | More ▾
+Row 3: Query text area (monospace): \`{ ( severity = "emergency" ) }\`
+Row 4: [Search button blue] | [Save As ▾]
+"Clear Search" link with green icon below
+
+## Results Area
+Chart: Horizontal bar chart showing event distribution by month (x-axis: months, y-axis: count)
+Legend: ● Months (green bars)
+Right: "Hide Graph" link | "Edit Widget" button
+
+## Results List (list view, NOT table view)
+ActionBar: [📋 Incident] [How to Extract Fields?] | pagination "1-3 of 3" [< >] [10 ▾] | Add/Remove Fields
+Each result is a card/row with:
+- Line 1 (bold): "Message: warning level1[...]: Config error: Incomplete bad chain for listener: <name>"
+- Line 2 (gray, key-value pairs): "Target Group: - | Source: rtp | LogType: antix | Target Domain: - | Remote Device: - | Time: 2026-01-29 17:03:15 | ..."
+- All fields shown inline with separators: LogonId, User Id, Common Report Name, Target User, Severity (highlighted "emergency" in blue badge), Audit Id, Group Id, Display Name, User Rid, Facility (rtp), Logon Type, User Name, Log Source: 192.168.2.15
+
+## Key Rules
+- Search results are list-view (expandable rows) not table rows
+- Severity badges are color-coded
+- Each result row is dense with many key-value fields
+- Bar chart above results shows distribution`,
+
+"security": `# Blueprint: Security — Analytics Dashboard (Shell A variant)
+
+## Layout
+TopNavBar → data-active-tab="Security"
+Title: "Security Analytics"
+Right: date range picker | 🛡 Manage Rules button
+No sidemenu — full-width scrollable dashboard.
+
+## Stat Cards Row (4 horizontal)
+1. All Rules - Detections: "81952" with delta "▲ 30655 (69.75%)" — blue shield icon
+2. Critical Rules - Detections: "48968" with delta "▲ 45040 (1295.90%)" — blue X icon
+3. Trouble Rules - Detections: "16247" with delta "▲ 10882 (-5.01%)" — orange X icon
+4. Attention Rules - Detections: "16737" with delta "▲ 14077 (529.31%)" — yellow ! icon
+
+## Widget Grid (3 columns)
+### Row 1:
+- LEFT: "Detection Pipeline" — horizontal stacked bar showing flow: 81952 Detections → [Critical (red) | Trouble (orange) | Attention (yellow)] → 708 Alerts
+- MIDDLE: "Detection by Tactics" — radar/spider chart with MITRE ATT&CK tactics around the perimeter (Defense Evasion, Lateral Movement, Impact, Execution, Credential Access Collection, Persistence, Privilege Escalation, Discovery, Command Control). Color-coded: Critical (red), Trouble (orange), Attention (yellow)
+- RIGHT: "Recent Detections" — scrollable list with colored left borders (red=critical, orange=trouble), each showing: Rule name, Username, Device Name, server info, MITRE ATT&CK Mapping, timestamp
+
+### Row 2:
+- LEFT: "Top 5 User by Detections" — vertical bar chart (x-axis: usernames like system0, server0, administrator, dc5, clusteruser. Color-coded by severity)
+- MIDDLE: "Top 5 Log Sources by Detections" — horizontal stacked bar chart (Server, logauto-dc, logon-w18-1, DC-8.0.0, 192.0.0.0). Colors: Critical=red, Trouble=orange, Attention=yellow
+
+### Row 3:
+- LEFT: "Top 10 Detections by Rules" — vertical bar chart (x-axis: rule identifier names, y-axis: count to 1M)
+- MIDDLE: "Detection Trends" — line chart (x-axis: months Dec–Nov, y-axis: count). Three colored lines: Critical, Trouble, Attention
+
+## Key Rules
+- All widgets use the widget component
+- MITRE ATT&CK tactics shown as radar chart (use ElegantEChart radar type)
+- Recent Detections list is similar to Recent Alerts in dashboard
+- Color coding consistent: Critical=#E24C4C, Trouble=#F5A623, Attention=#F8D648`,
+
+"cloud-protection": `# Blueprint: Cloud Protection (Shell A variant)
+
+## Layout
+TopNavBar → data-active-tab="Cloud Protection"
+Line-tab below topnavbar: Application Insight (selected) | User Insight
+Date range picker top-right
+No sidemenu — full-width scrollable dashboard.
+
+## Stat Cards Row (4 horizontal)
+1. Total Traffic: "298.69GB" with sub-stats "● Upload Size 14.03GB ● Download Size 5.83MB" — blue icon
+2. Total Request: "50416" with sub-stats "● Allowed 33616 ● Denied 16800" — blue icon
+3. Discovered Apps: "28" — grid icon (purple/blue)
+4. Shadow Apps: "10" — grid icon with warning overlay
+
+## Widget Grid (3 columns)
+### Row 1:
+- LEFT: "Total Traffic Trend" — area chart (blue fill, x-axis: months, y-axis: size in MB)
+- MIDDLE: "Top Cloud Apps By Request" — pie/donut chart with legend (instagram.com, mail.zoho.com, twitter.com, ad.yieldmanager.com, audio.stream.com)
+- RIGHT: "Top Attempted Banned Apps" — table: Cloud App | Count | Percentage (twitter.com: 3360 20%, ad.yieldmanager.com: 1800 10%, discord.com: 1800 10%, etc.)
+
+### Row 2:
+- LEFT: "Top Shadow Cloud Apps By Request" — bar chart (x-axis: app domains, y-axis: count to 10K)
+- MIDDLE: "Top Cloud Apps By Download Size" — donut chart with legend
+- RIGHT: "Top Cloud Apps By Upload Size" — horizontal bar chart (app domains on y-axis)
+
+### Row 3:
+- LEFT: "Top Cloud App Categories" — horizontal bar chart (categories: social networking, computer and internet, streaming media, web-based email, business and economy, etc.)
+- RIGHT: "Low Reputed Apps" — bar chart (x-axis: app domains, y-axis: count)
+
+## Key Rules
+- This is a dashboard-style page with stat cards + widget grid (like Shell A)
+- All charts use ElegantEChart.* calls
+- Pie/donut charts have side legends with colored dots`,
+
+"settings": `# Blueprint: Settings — Device Management (Shell B)
 
 ## Layout (Shell B)
 TopNavBar → data-active-tab="Settings"
-Sidemenu Type 1 (settings variant) on left.
-Main content: form-based settings panels.`,
+Sidemenu Type 1 (settings variant — icons for each section, NOT flat accordion):
+- Left panel has 2 icon tabs at top: ⚙ Configuration | 👤 Admin
+- Below: collapsible sections with icons:
+  - Log Source Configuration > (expanded: Devices, Applications, Import Logs, Manage Cloud Sources, File Integrity Monitoring)
+  - Cloud Protection Settings >
+
+## Page Header
+Title: "Device Management"
+
+## Line Tab (below header)
+Tabs: Windows Devices (7) (selected) | Syslog Devices (1) | Other Devices (7)
+Each tab shows count badge.
+
+## Input Row
+Select Category: [All Devices ▾] | "Configure domain/workgroups" link (blue)
+Right: [+ Add Device(s)] button (green/primary)
+
+## Table
+ActionBar: [🔍] [filter] [✓] [⚙] [⬇] [↕] icons | pagination "1-10 of 64" [< >] [10 ▾] | view toggle icons
+Columns: [checkbox] | Actions | Device ▾ | Show IP | Agent | Last Message Time ▾ | Next Scan On | Monitoring Interval | Log Source Group | Status
+Row data:
+- Actions column: small icon buttons (delete, edit, checkmark — 3 action icons per row)
+- Device: "1", "10.0.0.1", "11.0.0.1", "192.168.111.14", etc.
+- Agent: "logon-N-1" with agent icon
+- Status: "Listening for logs" (green), "Disabled" (red text)
+- Monitoring Interval: "Real-time"
+- Log Source Group: "WindowsGroup", "StatusGroup"
+
+## Key Rules
+- Settings pages use Shell B (sidemenu-settings + main content)
+- Sidemenu Type 1 has ICONS (not just text like Type 2)
+- Tab counts in parentheses after tab name
+- Action icons in table rows are small (14px) icon buttons
+- Status column is color-coded: green=active, red=disabled`,
+
+"settings-license": `# Blueprint: Settings — License Page
+
+## Layout (Shell B)
+Same settings shell. Sidemenu section active item varies.
+
+## Content
+License info page with storage stats, feature table with usage bars, plan details.`,
+
+"incident-workbench": `# Blueprint: Incident Workbench (floating panel)
+
+## Layout
+This is NOT a full page — it's a floating bottom-right panel/bar that appears on every page.
+Shows: "🛡 Incident Workbench" label | X close button | expand icon
+When expanded: shows investigation tools (IP Threat Intel, Process Hunting, User Activity Overview).`,
 };
 
 function handleGetPageBlueprint(args: { page: string }): string {
