@@ -131,7 +131,48 @@ const CHECKLIST: Record<string, string> = {
 
 const ANTI_PATTERNS = `# Known Bottlenecks & Anti-Patterns\n\n| # | Symptom | Root cause | Fix |\n|---|---|---|---|\n| 1 | Reports quicklink plain text | line-tab.css not linked | Add line-tab.css link |\n| 2 | ActionBar has view-toggle on Reports | Using Type 1-7 | Reports = Type 8 |\n| 3 | Table columns uneven | Hard-coded col widths | Checkbox=32px, rest=no width |\n| 4 | Drawer body flush | style="padding:0" | Use --no-pad modifier |\n| 5 | classic-tab in drawer | Used classic-tab inside drawer | Use line-tab inside drawers |\n| 6 | Tabs switch but no change | Custom data-*-tab attributes | Use standard data-tab only |\n| 7 | Dropdown 432px in drawer | flex:1 override | Delete override, use 280px fixed |\n| 8 | table-scroll-area gone | Missing min-height:0 | Every ancestor: flex:1; min-height:0; overflow:hidden |`;
 
-const SETUP_PROJECT = `# MANDATORY: Project Setup — CDN Mode\n\n## CDN Base URL\n\`\`\`\n${CDN_BASE}\n\`\`\`\n\nAll CSS, JS, SVG icons, and fonts served from this public CDN.\nOutput = SINGLE index.html file.\n\n## CRITICAL RULES\n1. ALL CSS from CDN — <link href="${CDN_BASE}/components/*.css">. NEVER inline.\n2. ALL JS from CDN — <script src="${CDN_BASE}/components/*.js">. NEVER custom JS for components.\n3. ALL ICONS from CDN — <img src="${CDN_BASE}/assets/icons/icon-*.svg">. 195 pre-exported SVGs.\n4. FONTS auto-load via tokens.css.\n5. Logo: <img src="${CDN_BASE}/assets/icons/logo-log360.svg">\n6. Output = SINGLE index.html\n\n## ⛔ FORBIDDEN ACTIONS — NEVER DO THESE\n- NEVER create local folders (no mkdir, no figma-export/, no assets/)\n- NEVER copy files locally (no cp, no copy commands)\n- NEVER read from figma-export/ or any local HTML as reference — use get_page_blueprint and get_screenshot tools instead\n- NEVER use inline CSS/JS for component styles — all from CDN\n- NEVER use inline <svg> when an icon file exists in the library\n\n## Icon reference pattern\nEvery component: <img src="${CDN_BASE}/assets/icons/icon-NAME.svg">\n\n## Available CSS files\ntokens, layout, topnavbar, sidemenu, header, classic-tab, line-tab, table, table-type2, form-input, form-dropdown, drawer, rpt-chart-floater, widget, echarts-widget, note-container, notification-banner, responsive\n\n## Available JS files\ntopnavbar, sidemenu, classic-tab, line-tab, table, form-input, form-dropdown, drawer, rpt-chart-floater, widget, echarts-widget, echarts-elegant-theme, icon-engine, notification-banner, lib/echarts.min.js`;
+const SETUP_PROJECT = `# Elegant 1.0 — Build Instructions
+
+## How This Works
+You are connected to the Elegant Agent MCP server. ALL component HTML, wiki documentation, page blueprints, icons, and screenshots are available ONLY through the MCP tools listed below. There are NO local files to read — everything comes from this server.
+
+## CDN Base URL
+\`\`\`
+${CDN_BASE}
+\`\`\`
+
+## Workflow (follow this order)
+1. ✅ You already called setup_project — good
+2. Call \`get_page_blueprint(page)\` — get exact layout for the target page
+3. Call \`get_screenshot(query)\` — see what the real page looks like
+4. Call \`get_recipe(shell)\` — get shell type (A/B/C/D) instructions
+5. Call \`get_shell(shell)\` — get the HTML skeleton with CDN links
+6. Call \`get_component(name)\` — get HTML for each component you need
+7. Call \`get_topnavbar()\` — get the complete TopNavBar HTML
+8. Call \`get_chart_snippet(chart_type)\` — get chart JS code
+9. Write a SINGLE index.html file — that's your only output
+
+## Output Rules
+- Output = **ONE index.html file** — nothing else
+- ALL CSS via CDN: \`<link href="${CDN_BASE}/components/FILENAME.css">\`
+- ALL JS via CDN: \`<script src="${CDN_BASE}/components/FILENAME.js">\`
+- ALL icons via CDN: \`<img src="${CDN_BASE}/assets/icons/ICON.svg">\`
+- Logo: \`<img src="${CDN_BASE}/assets/icons/logo-log360.svg">\`
+- Fonts load automatically via tokens.css
+
+## Available CSS Files
+tokens.css, layout.css, topnavbar.css, sidemenu.css, header.css, classic-tab.css, line-tab.css, table.css, table-type2.css, form-input.css, form-dropdown.css, drawer.css, rpt-chart-floater.css, widget.css, echarts-widget.css, note-container.css, notification-banner.css, responsive.css
+
+## Available JS Files
+topnavbar.js, sidemenu.js, classic-tab.js, line-tab.js, table.js, form-input.js, form-dropdown.js, drawer.js, rpt-chart-floater.js, widget.js, echarts-widget.js, echarts-elegant-theme.js, icon-engine.js, notification-banner.js, lib/echarts.min.js
+
+## ⛔ DO NOT
+- Do NOT search for or read any local files (no LLM-WIKI.md, no Components-Wiki/, no data/ folder, no figma-export/)
+- Do NOT create folders or copy files
+- Do NOT write inline CSS for component styles
+- Do NOT write inline SVG when an icon file exists
+- Do NOT look for reference HTML in the user's workspace — use get_page_blueprint and get_screenshot instead
+- ALL data you need comes from the MCP tools above — you have everything`;
 
 const WIKI_FILES = [
   "INDEX.md","actionbar.md","app_shells.md","button-row.md","classic_tab.md",
@@ -511,30 +552,30 @@ Bottom-right panel on every page. Shows investigation tools (IP Threat Intel, Pr
 const handler = createMcpHandler(
   (server) => {
     /* 1. setup_project */
-    server.tool("setup_project", "CALL FIRST. CDN URLs, icon table, rules. Output = SINGLE index.html. NEVER create local folders, NEVER copy assets, NEVER read figma-export/.", { feature_name: z.string().describe("Feature name for the HTML file (e.g. 'windows-startup'). Output is a SINGLE index.html — no folders needed.") }, async ({ feature_name }) => {
+    server.tool("setup_project", "⚠️ CALL THIS FIRST before any other tool. Returns the complete build instructions, CDN URLs, available CSS/JS files, and workflow steps. You MUST follow the workflow it returns. Output is always a SINGLE index.html file with all assets loaded from CDN.", { feature_name: z.string().describe("Name for the page being built (e.g. 'windows-startup', 'dashboard', 'alerts'). Used only as a label — no folders are created.") }, async ({ feature_name }) => {
       const name = feature_name.replace(/[^a-zA-Z0-9_-]/g, "-").toLowerCase();
       return { content: [{ type: "text" as const, text: SETUP_PROJECT.replace(/your-feature-name/g, name).replace(/\$FEATURE/g, name) }] };
     });
 
     /* 2. get_component */
-    server.tool("get_component", "Canonical HTML snippet for any Elegant 1.0 component.", { name: z.enum(Object.keys(COMPONENT_MAP) as [string, ...string[]]) }, async ({ name: n }) => {
+    server.tool("get_component", "Returns the canonical HTML for an Elegant 1.0 UI component. All asset paths are pre-filled with CDN URLs. Copy this HTML directly into your index.html. Do NOT search for component files locally — this tool is the only source.", { name: z.enum(Object.keys(COMPONENT_MAP) as [string, ...string[]]) }, async ({ name: n }) => {
       const entry = COMPONENT_MAP[n];
-      if (!entry) return { content: [{ type: "text" as const, text: `Unknown: ${n}. Available: ${Object.keys(COMPONENT_MAP).join(", ")}` }] };
+      if (!entry) return { content: [{ type: "text" as const, text: `Unknown component: ${n}.\n\nAvailable components (use list_components for full list):\n${Object.keys(COMPONENT_MAP).join(", ")}` }] };
       const content = await readWikiFile(entry.file);
       if (!entry.section) return { content: [{ type: "text" as const, text: content }] };
       const html = rewriteAssetPaths(extractHtmlBlock(content, entry.section));
-      return { content: [{ type: "text" as const, text: `## ${n}\nSource: ${entry.file}\n\n\`\`\`html\n${html}\n\`\`\`` }] };
+      return { content: [{ type: "text" as const, text: `## ${n}\nCDN: ${CDN_BASE}\nAll <img src> and <link href> paths below use the CDN. Copy as-is.\n\n\`\`\`html\n${html}\n\`\`\`` }] };
     });
 
     /* 3. get_recipe */
-    server.tool("get_recipe", "Full recipe for Shell A/B/C/D.", { shell: z.enum(["A","B","C","D"]) }, async ({ shell }) => {
+    server.tool("get_recipe", "Returns the full build recipe for a Shell type: required components, CSS load order, scroll model, and page structure. A=Dashboard, B=Settings, C=Reports, D=Split-Panel.", { shell: z.enum(["A","B","C","D"]) }, async ({ shell }) => {
       return { content: [{ type: "text" as const, text: RECIPES[shell] || `Unknown shell: ${shell}` }] };
     });
 
     /* 4. get_shell */
-    server.tool("get_shell", "HTML skeleton for Shell A/B/C/D with CDN links.", { shell: z.enum(["A","B","C","D"]) }, async ({ shell }) => {
+    server.tool("get_shell", "Returns a complete HTML skeleton (<!DOCTYPE> to </html>) for Shell A/B/C/D with all CSS/JS CDN links pre-filled and SLOT comments where you insert components. Use this as your starting template.", { shell: z.enum(["A","B","C","D"]) }, async ({ shell }) => {
       const s = SHELLS[shell];
-      return { content: [{ type: "text" as const, text: s ? `## Shell ${shell}\n\n\`\`\`html\n${s}\n\`\`\`` : `Unknown: ${shell}` }] };
+      return { content: [{ type: "text" as const, text: s ? `## Shell ${shell} — Ready-to-use HTML skeleton\nAll CSS/JS links point to CDN: ${CDN_BASE}\nAll icon <img src> must also use: ${CDN_BASE}/assets/icons/ICON.svg\n\n\`\`\`html\n${s}\n\`\`\`` : `Unknown: ${shell}` }] };
     });
 
     /* 5. get_chart_snippet */
@@ -554,7 +595,7 @@ const handler = createMcpHandler(
     });
 
     /* 8. list_components */
-    server.tool("list_components", "Lists all available component names.", {}, async () => {
+    server.tool("list_components", "Lists all component names you can pass to get_component(). Grouped by category.", {}, async () => {
       const grouped: Record<string, string[]> = {
         Navigation: ["topnavbar","sidemenu-settings","sidemenu-reports","line-tab","line-tab-quicklink"],
         Header: ["header-v1","header-v2","header-v3"],
@@ -571,7 +612,7 @@ const handler = createMcpHandler(
     });
 
     /* 9. search_wiki */
-    server.tool("search_wiki", "Full-text search across wiki files.", { query: z.string(), max_results: z.number().optional() }, async ({ query, max_results }) => {
+    server.tool("search_wiki", "Full-text search across all component wiki documentation. Use this to find where a CSS class, rule, or pattern is documented. Do NOT search local files — this tool searches the complete wiki.", { query: z.string(), max_results: z.number().optional() }, async ({ query, max_results }) => {
       const q = query.toLowerCase();
       const max = max_results || 20;
       const results: string[] = [];
@@ -592,7 +633,7 @@ const handler = createMcpHandler(
     });
 
     /* 10. get_icons */
-    server.tool("get_icons", "SVG icon filenames with CDN URLs.", { filter: z.string().optional() }, async ({ filter }) => {
+    server.tool("get_icons", "Returns SVG icon filenames with full CDN URLs. Use filter to search by name. There are 195 icons available. Do NOT search for icons locally.", { filter: z.string().optional().describe("Substring to filter icon names (e.g. 'action', 'ab-', 'rpt', 'chevron')") }, async ({ filter }) => {
       let icons = ALL_ICONS;
       if (filter) { const f = filter.toLowerCase(); icons = icons.filter(i => i.toLowerCase().includes(f)); }
       if (!icons.length) return { content: [{ type: "text" as const, text: `No icons for "${filter}"` }] };
@@ -600,24 +641,26 @@ const handler = createMcpHandler(
     });
 
     /* 11. get_full_wiki_file */
-    server.tool("get_full_wiki_file", "Complete wiki .md file content.", { filename: z.string() }, async ({ filename }) => {
+    server.tool("get_full_wiki_file", "Returns the COMPLETE content of a wiki .md file. Use only when get_component isn't enough (e.g. you need CSS details or variant rules). Do NOT read wiki files from the local filesystem — this tool fetches them from the server.", { filename: z.string().describe("Wiki filename (e.g. 'drawer.md', 'form_input.md', 'header.md')") }, async ({ filename }) => {
       return { content: [{ type: "text" as const, text: rewriteAssetPaths(await readWikiFile(filename)) }] };
     });
 
     /* 12. get_topnavbar */
-    server.tool("get_topnavbar", "Complete TopNavBar HTML with CDN icons.", {}, async () => {
+    server.tool("get_topnavbar", "Returns the complete TopNavBar HTML with all icon paths pre-filled as CDN URLs. Includes logo, navigation tabs, search, notification, and avatar. Copy directly into your HTML.", {}, async () => {
       const content = await readWikiFile("topnavbar.md");
       const html = rewriteAssetPaths(extractHtmlBlock(content, "Complete HTML"));
-      return { content: [{ type: "text" as const, text: `## TopNavBar\nLogo: ${CDN_BASE}/assets/icons/logo-log360.svg\n\n\`\`\`html\n${html}\n\`\`\`` }] };
+      return { content: [{ type: "text" as const, text: `## TopNavBar — Complete HTML (copy as-is)\nCDN: ${CDN_BASE}\nLogo: ${CDN_BASE}/assets/icons/logo-log360.svg\nAll icon paths are CDN URLs. Do NOT replace with inline SVG.\n\n\`\`\`html\n${html}\n\`\`\`` }] };
     });
 
     /* 13. get_page_blueprint */
-    server.tool("get_page_blueprint", "Visual blueprint of a real Log360 page. Use INSTEAD of reading local files. NEVER read figma-export/.", { page: z.enum(Object.keys(PAGE_BLUEPRINTS) as [string, ...string[]]) }, async ({ page }) => {
-      return { content: [{ type: "text" as const, text: PAGE_BLUEPRINTS[page] || `Unknown page: ${page}` }] };
+    server.tool("get_page_blueprint", "Returns the exact layout specification for a real Log360 Cloud page — component hierarchy, column names, data patterns, chart config, sidemenu items. This is your ONLY reference for what the page looks like. Do NOT look for screenshots or HTML files locally.", { page: z.enum(Object.keys(PAGE_BLUEPRINTS) as [string, ...string[]]) }, async ({ page }) => {
+      const bp = PAGE_BLUEPRINTS[page];
+      if (!bp) return { content: [{ type: "text" as const, text: `Unknown page: ${page}.\n\nAvailable pages:\n${Object.keys(PAGE_BLUEPRINTS).join("\n")}` }] };
+      return { content: [{ type: "text" as const, text: bp + `\n\n---\nCDN: ${CDN_BASE}\nAfter reading this blueprint, call get_shell() for the HTML skeleton, then get_component() for each component listed above.` }] };
     });
 
     /* 14. get_screenshot */
-    server.tool("get_screenshot", "Search product screenshots by keywords. Use INSTEAD of browsing local files. NEVER look at figma-export/.", { query: z.string(), max_results: z.number().optional() }, async ({ query, max_results }) => {
+    server.tool("get_screenshot", "Searches 217 real product screenshots by keywords. Returns image URLs showing exact layouts, colors, and spacing. Use this for visual reference instead of looking for local files.", { query: z.string().describe("Search keywords (e.g. 'windows startup', 'alerts main', 'dashboard', 'settings device')"), max_results: z.number().optional().describe("Max results, default 5") }, async ({ query, max_results }) => {
       const keywords = query.toLowerCase().split(/[\s,]+/).filter(Boolean);
       const max = max_results || 5;
       const scored = SCREENSHOTS.map(s => {
@@ -626,15 +669,20 @@ const handler = createMcpHandler(
         for (const kw of keywords) { if (lower.includes(kw)) score++; }
         return { path: s, score };
       }).filter(r => r.score > 0).sort((a, b) => b.score - a.score).slice(0, max);
-      if (!scored.length) return { content: [{ type: "text" as const, text: `No screenshots for "${query}". Try: windows startup, alerts main, dashboard events, settings device` }] };
+      if (!scored.length) return { content: [{ type: "text" as const, text: `No screenshots for "${query}". Try broader keywords.\nAvailable tabs: ALERTS, COMPLIANCE, DASHBOARD, REPORTS, SEARCH, Security, Settings, CLOUD PROTECTION.\nExample: "windows startup", "alerts main", "dashboard events", "settings device"` }] };
       const lines = scored.map((r, i) => {
         const encoded = r.path.split('/').map(p => encodeURIComponent(p)).join('/');
         return `${i+1}. **${r.path}**\n   URL: ${SCREENSHOT_BASE}/${encoded}`;
       });
-      return { content: [{ type: "text" as const, text: `Found ${scored.length} screenshot(s):\n\n${lines.join("\n\n")}` }] };
+      return { content: [{ type: "text" as const, text: `Found ${scored.length} screenshot(s) for "${query}":\n\n${lines.join("\n\n")}\n\nThese are real product screenshots. Match the layout exactly.` }] };
     });
   },
-  { serverInfo: { name: "elegant-agent-mcp", version: "1.0.0" } },
+  {
+    serverInfo: { name: "elegant-agent-mcp", version: "1.0.0" },
+    capabilities: {
+      tools: {},
+    },
+  },
   { basePath: "/api", disableSse: true },
 );
 
