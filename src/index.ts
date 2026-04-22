@@ -974,12 +974,12 @@ const TOOLS: Tool[] = [
     inputSchema: {
       type: "object",
       properties: {
-        type: {
+        chart_type: {
           type: "string",
           enum: ["line", "area", "bar", "hbar", "donut", "stacked"],
         },
       },
-      required: ["type"],
+      required: ["chart_type"],
     },
   },
   {
@@ -1113,10 +1113,11 @@ function handleGetShell(args: { shell: string }): string {
   return `## Shell ${args.shell.toUpperCase()} Skeleton\n\nAll CSS/JS links point to CDN: ${CDN_BASE}\nAll icon <img> src must also use: ${CDN_BASE}/assets/icons/ICON_NAME.svg\n\n\`\`\`html\n${s}\n\`\`\``;
 }
 
-function handleGetChartSnippet(args: { type: string }): string {
-  const s = CHART_SNIPPETS[args.type.toLowerCase()];
-  if (!s) return `Unknown chart type: ${args.type}. Options: ${Object.keys(CHART_SNIPPETS).join(", ")}`;
-  return `## ${args.type} Chart Snippet\n\n${s}`;
+function handleGetChartSnippet(args: { chart_type: string }): string {
+  const t = args.chart_type.toLowerCase();
+  const s = CHART_SNIPPETS[t];
+  if (!s) return `Unknown chart type: ${t}. Options: ${Object.keys(CHART_SNIPPETS).join(", ")}`;
+  return `## ${t} Chart Snippet\n\n${s}`;
 }
 
 function handleGetChecklist(args: { shell: string }): string {
@@ -1304,7 +1305,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case "get_component":      text = await handleGetComponent(args as { name: string }); break;
       case "get_recipe":         text = handleGetRecipe(args as { shell: string }); break;
       case "get_shell":          text = handleGetShell(args as { shell: string }); break;
-      case "get_chart_snippet":  text = handleGetChartSnippet(args as { type: string }); break;
+      case "get_chart_snippet":  text = handleGetChartSnippet(args as { chart_type: string }); break;
       case "get_checklist":      text = handleGetChecklist(args as { shell: string }); break;
       case "get_anti_patterns":  text = handleGetAntiPatterns(); break;
       case "list_components":    text = handleListComponents(); break;

@@ -945,12 +945,12 @@ const TOOLS = [
         inputSchema: {
             type: "object",
             properties: {
-                type: {
+                chart_type: {
                     type: "string",
                     enum: ["line", "area", "bar", "hbar", "donut", "stacked"],
                 },
             },
-            required: ["type"],
+            required: ["chart_type"],
         },
     },
     {
@@ -1082,10 +1082,11 @@ function handleGetShell(args) {
     return `## Shell ${args.shell.toUpperCase()} Skeleton\n\nAll CSS/JS links point to CDN: ${CDN_BASE}\nAll icon <img> src must also use: ${CDN_BASE}/assets/icons/ICON_NAME.svg\n\n\`\`\`html\n${s}\n\`\`\``;
 }
 function handleGetChartSnippet(args) {
-    const s = CHART_SNIPPETS[args.type.toLowerCase()];
+    const t = args.chart_type.toLowerCase();
+    const s = CHART_SNIPPETS[t];
     if (!s)
-        return `Unknown chart type: ${args.type}. Options: ${Object.keys(CHART_SNIPPETS).join(", ")}`;
-    return `## ${args.type} Chart Snippet\n\n${s}`;
+        return `Unknown chart type: ${t}. Options: ${Object.keys(CHART_SNIPPETS).join(", ")}`;
+    return `## ${t} Chart Snippet\n\n${s}`;
 }
 function handleGetChecklist(args) {
     const c = CHECKLIST[args.shell.toUpperCase()];
