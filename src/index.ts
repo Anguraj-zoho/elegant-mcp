@@ -1379,10 +1379,12 @@ function handleGetScreenshot(args: { query: string; max_results?: number }): str
 ══════════════════════════════════════════════════════ */
 function rewriteAssetPaths(html: string): string {
   // Match all relative forms: ./assets/, assets/, ../assets/, ../../assets/ ...
-  // Capture in both src="..." and href="..." (single and double quotes).
+  // Covers: src="...", href="...", and any data-* attribute pointing at assets/
+  // (e.g. data-icon, data-src, data-hover-icon — used by JS for dynamic swaps).
   return html
     .replace(/src=(["'])(?:\.\/|(?:\.\.\/)+)?assets\//g, (_m, q) => `src=${q}${CDN_BASE}/assets/`)
-    .replace(/href=(["'])(?:\.\/|(?:\.\.\/)+)?assets\//g, (_m, q) => `href=${q}${CDN_BASE}/assets/`);
+    .replace(/href=(["'])(?:\.\/|(?:\.\.\/)+)?assets\//g, (_m, q) => `href=${q}${CDN_BASE}/assets/`)
+    .replace(/(data-[a-z-]+)=(["'])(?:\.\/|(?:\.\.\/)+)?assets\//g, (_m, attr, q) => `${attr}=${q}${CDN_BASE}/assets/`);
 }
 
 async function handleGetComponent(args: { name: string }): Promise<string> {
