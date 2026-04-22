@@ -1336,9 +1336,11 @@ function handleGetScreenshot(args) {
    TOOL HANDLERS
 ══════════════════════════════════════════════════════ */
 function rewriteAssetPaths(html) {
+    // Match all relative forms: ./assets/, assets/, ../assets/, ../../assets/ ...
+    // Capture in both src="..." and href="..." (single and double quotes).
     return html
-        .replace(/src="(?:\.\.\/)*assets\//g, `src="${CDN_BASE}/assets/`)
-        .replace(/href="(?:\.\.\/)*assets\//g, `href="${CDN_BASE}/assets/`);
+        .replace(/src=(["'])(?:\.\/|(?:\.\.\/)+)?assets\//g, (_m, q) => `src=${q}${CDN_BASE}/assets/`)
+        .replace(/href=(["'])(?:\.\/|(?:\.\.\/)+)?assets\//g, (_m, q) => `href=${q}${CDN_BASE}/assets/`);
 }
 async function handleGetComponent(args) {
     const entry = COMPONENT_MAP[args.name];

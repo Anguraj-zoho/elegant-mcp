@@ -35,9 +35,11 @@ async function readWikiFile(filename: string): Promise<string> {
 
 /* ── Helpers ── */
 function rewriteAssetPaths(html: string): string {
+  // Match all relative forms: ./assets/, assets/, ../assets/, ../../assets/ ...
+  // Capture in both src="..." and href="..." (single and double quotes).
   return html
-    .replace(/src="(?:\.\.\/)*assets\//g, `src="${CDN_BASE}/assets/`)
-    .replace(/href="(?:\.\.\/)*assets\//g, `href="${CDN_BASE}/assets/`);
+    .replace(/src=(["'])(?:\.\/|(?:\.\.\/)+)?assets\//g, (_m, q) => `src=${q}${CDN_BASE}/assets/`)
+    .replace(/href=(["'])(?:\.\/|(?:\.\.\/)+)?assets\//g, (_m, q) => `href=${q}${CDN_BASE}/assets/`);
 }
 
 function extractSection(content: string, heading: string): string {
