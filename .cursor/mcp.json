@@ -1,0 +1,1 @@
+{"mcpServers":{"elegant-mcp":{"command":"node","args":["dist/index.js"],"env":{}}}}
