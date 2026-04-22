@@ -916,7 +916,7 @@ const COMPONENT_MAP: Record<string, { file: string; section?: string }> = {
   "drawer-lg":            { file: "drawer.md",                          section: "Variant 3" },
   "form-text":            { file: "form_input.md",                      section: "Type 1" },
   "form-textarea":        { file: "form_input.md",                      section: "Type 3" },
-  "form-checkbox":        { file: "form_input.md",                      section: "Type 4" },
+  "form-checkbox":        { file: "form_input.md",                      section: "Type 23: Checkbox Group" },
   "form-radio":           { file: "form_input.md",                      section: "Type 5" },
   "form-dropdown":        { file: "form_dropdown.md",                   section: "Type 1: Basic Dropdown (plain text items)" },
   "widget":               { file: "widget.md",                          section: "Dashboard Container" },
